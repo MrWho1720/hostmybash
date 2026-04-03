@@ -39,7 +39,8 @@
       "Bash(PGPASSWORD='mrwho@test' psql:*)",
       "Bash(curl -sI http://localhost:3000/login)",
       "Bash(curl -s -H \"X-Forwarded-Proto: https\" -H \"Host: endever.in\" http://localhost:3000/login)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(openssl x509:*)"
     ]
   }
 }

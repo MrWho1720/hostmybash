@@ -240,6 +240,9 @@ sudo ln -sf /etc/nginx/sites-available/hostmybash /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
+> **Note:** The Next.js 14/15 App Router relies on chunked streaming. NGINX uses HTTP/1.0 for reverse proxying by default, which will cause Next.js streams to hang indefinitely. Ensure your NGINX proxy locations define `proxy_http_version 1.1;` and `proxy_set_header Connection "";` as demonstrated in the included `deploy/nginx.conf` file.
+
+
 ### 5. Systemd Service
 
 ```bash
