@@ -108,18 +108,13 @@ export default function ExplorePage() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchScripts(sort, query, offset);
-  }, [sort, offset, fetchScripts]);
-
-  // Debounced search
+  // Single debounced effect for all fetches
   useEffect(() => {
     const timer = setTimeout(() => {
-      setOffset(0);
-      fetchScripts(sort, query, 0);
-    }, 400);
+      fetchScripts(sort, query, offset);
+    }, query ? 400 : 0);
     return () => clearTimeout(timer);
-  }, [query, sort, fetchScripts]);
+  }, [sort, query, offset, fetchScripts]);
 
   const sortTabs: { key: SortMode; label: string }[] = [
     { key: "trending", label: "Trending" },
