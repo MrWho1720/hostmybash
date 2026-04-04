@@ -34,9 +34,11 @@ export function proxy(request: NextRequest) {
 
     const pathname = request.nextUrl.pathname;
 
-    // Root of subdomain → could show user profile later; for now redirect
+    // Root of subdomain → rewrite to public profile page
     if (pathname === "/" || pathname === "") {
-      return NextResponse.next();
+      const url = request.nextUrl.clone();
+      url.pathname = `/u/${username}`;
+      return NextResponse.rewrite(url);
     }
 
     // Rewrite user1.endever.in/install-nginx → /s/user1/install-nginx

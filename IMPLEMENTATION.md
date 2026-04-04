@@ -29,7 +29,7 @@
 - [x] Show avatar + displayName + @username in sidebar footer
 - [x] Link to `/settings`
 
-## Phase 6: Public User Profile Page
-- [ ] `username.endever.in/` (subdomain root) shows public profile
-- [ ] Avatar, display name, bio, list of public scripts
-- [ ] Proper 404 for non-existent users
+## Phase 6: Public User Profile Page ✅
+- [x] `username.endever.in/` (subdomain root) shows public profile
+- [x] Avatar, display name, bio, list of public scripts
+- [x] Proper 404 for non-existent users
