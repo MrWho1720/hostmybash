@@ -75,22 +75,22 @@ function CheckIcon() {
 
 export default function ScriptDetailPage() {
   const { id } = useParams();
-  const router  = useRouter();
+  const router = useRouter();
 
-  const [script,      setScript]      = useState<Script | null>(null);
-  const [editing,     setEditing]     = useState(false);
-  const [saving,      setSaving]      = useState(false);
-  const [error,       setError]       = useState("");
-  const [copied,      setCopied]      = useState(false);
-  const [username,    setUsername]    = useState("");
-  const [starred,     setStarred]     = useState(false);
+  const [script, setScript] = useState<Script | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [username, setUsername] = useState("");
+  const [starred, setStarred] = useState(false);
   const [starLoading, setStarLoading] = useState(false);
 
-  const [name,        setName]        = useState("");
-  const [slug,        setSlug]        = useState("");
+  const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
-  const [content,     setContent]     = useState("");
-  const [visibility,  setVisibility]  = useState("public");
+  const [content, setContent] = useState("");
+  const [visibility, setVisibility] = useState("public");
 
   useEffect(() => {
     fetch(`/api/scripts/${id}`)
@@ -112,15 +112,15 @@ export default function ScriptDetailPage() {
     fetch("/api/auth/me")
       .then((r) => r.json())
       .then((data) => { if (data.username) setUsername(data.username); })
-      .catch(() => {});
+      .catch(() => { });
 
     fetch(`/api/scripts/${id}/star`)
       .then((r) => r.json())
       .then((data) => setStarred(data.starred))
-      .catch(() => {});
+      .catch(() => { });
   }, [id]);
 
-  const mainHost   = typeof window !== "undefined" ? window.location.hostname : "hostmybash.com";
+  const mainHost = typeof window !== "undefined" ? window.location.hostname : "hostmybash.com";
   const curlCommand = username && script
     ? `bash <(curl -s https://${username}.${mainHost}/${script.slug})`
     : "";
@@ -132,7 +132,7 @@ export default function ScriptDetailPage() {
     navigator.clipboard.writeText(curlCommand).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    }).catch(() => {});
+    }).catch(() => { });
   }
 
   async function toggleStar() {
@@ -140,8 +140,8 @@ export default function ScriptDetailPage() {
     setStarLoading(true);
     try {
       const method = starred ? "DELETE" : "PUT";
-      const res    = await fetch(`/api/scripts/${id}/star`, { method });
-      const data   = await res.json();
+      const res = await fetch(`/api/scripts/${id}/star`, { method });
+      const data = await res.json();
       setStarred(data.starred);
       if (script) {
         setScript({
@@ -149,13 +149,13 @@ export default function ScriptDetailPage() {
           starCount: data.starred ? script.starCount + 1 : Math.max(0, script.starCount - 1),
         });
       }
-    } catch {}
+    } catch { }
     setStarLoading(false);
   }
 
   async function handleFork() {
     try {
-      const res  = await fetch(`/api/scripts/${id}/fork`, { method: "POST" });
+      const res = await fetch(`/api/scripts/${id}/fork`, { method: "POST" });
       const data = await res.json();
       if (res.ok && data.script) {
         router.push(`/scripts/${data.script.id}`);
@@ -208,9 +208,9 @@ export default function ScriptDetailPage() {
   }
 
   const visibilityColor =
-    script.visibility === "public"   ? "var(--success)"  :
-    script.visibility === "private"  ? "var(--text-muted)" :
-    "var(--warning)";
+    script.visibility === "public" ? "var(--success)" :
+      script.visibility === "private" ? "var(--text-muted)" :
+        "var(--warning)";
 
   /* ─── Shared button style ─── */
   const btnBase: React.CSSProperties = {
@@ -230,7 +230,7 @@ export default function ScriptDetailPage() {
   };
 
   return (
-    <div style={{ maxWidth: 880 }} className="animate-fade-in">
+    <div style={{ width: "100%", maxWidth: "1200px", margin: "0 auto" }} className="animate-fade-in">
       {/* ── Breadcrumb ── */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, fontSize: 13, color: "var(--text-muted)" }}>
         <Link href="/scripts" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}>
@@ -510,7 +510,7 @@ export default function ScriptDetailPage() {
               <button
                 type="button"
                 onClick={() => {
-                  navigator.clipboard.writeText(script.content).catch(() => {});
+                  navigator.clipboard.writeText(script.content).catch(() => { });
                 }}
                 style={{
                   display: "inline-flex", alignItems: "center", gap: 5,

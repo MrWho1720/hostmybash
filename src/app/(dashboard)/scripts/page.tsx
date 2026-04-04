@@ -110,7 +110,7 @@ export default function ScriptsPage() {
   }, []);
 
   return (
-    <div style={{ maxWidth: 900 }}>
+    <div style={{ width: "100%", maxWidth: "1200px", margin: "0 auto" }}>
       {/* ── Page header ── */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>

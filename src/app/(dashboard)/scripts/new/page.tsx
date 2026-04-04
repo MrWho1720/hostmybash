@@ -52,7 +52,7 @@ export default function NewScriptPage() {
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="w-full max-w-5xl mx-auto">
       <h2 className="text-2xl font-semibold text-heading mb-6 tracking-tight">New Script</h2>
 
       {error && (
