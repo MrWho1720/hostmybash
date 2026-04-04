@@ -5,18 +5,18 @@
    ============================================================ */
 :root,
 .dark {
-  --bg-page:     #0a0a0a;
-  --bg-surface:  #111111;
-  --bg-elevated: #171717;
-  --bg-inset:    #0d0d0d;
+  --bg-page:     #13151a;
+  --bg-surface:  #1d2028;
+  --bg-elevated: #282c36;
+  --bg-inset:    #101216;
 
-  --border:      #1f1f1f;
-  --border-muted:#2a2a2a;
+  --border:      #303541;
+  --border-muted:#3b4150;
 
-  --text-heading: #e5e5e5;
-  --text-body:    #a3a3a3;
-  --text-muted:   #737373;
-  --text-faint:   #525252;
+  --text-heading: #ffffff;
+  --text-body:    #a3a9b5;
+  --text-muted:   #7d8697;
+  --text-faint:   #5b6371;
 
   --accent:       #3b82f6;
   --accent-hover: #2563eb;
@@ -50,18 +50,18 @@
    LIGHT MODE (Apple style — clean whites, SF-gray palette)
    ============================================================ */
 .light {
-  --bg-page:     #f5f5f7;
+  --bg-page:     #f4f5f8;
   --bg-surface:  #ffffff;
-  --bg-elevated: #f0f0f2;
-  --bg-inset:    #e8e8ed;
+  --bg-elevated: #f0f1f4;
+  --bg-inset:    #e8eaef;
 
-  --border:      #d2d2d7;
-  --border-muted:#e5e5ea;
+  --border:      #e2e4e9;
+  --border-muted:#eceef1;
 
-  --text-heading: #1d1d1f;
-  --text-body:    #4a4a4f;
-  --text-muted:   #86868b;
-  --text-faint:   #aeaeb2;
+  --text-heading: #111827;
+  --text-body:    #4b5563;
+  --text-muted:   #6b7280;
+  --text-faint:   #9ca3af;
 
   --accent:       #0071e3;
   --accent-hover: #0077ed;
@@ -160,6 +160,28 @@ body {
 }
 .gh-card:hover {
   border-color: var(--border-muted);
+}
+
+/* Dashboard Card (Nolito style) */
+.dashboard-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -2px rgba(0,0,0,0.01);
+  transition: all 0.2s ease;
+}
+.light .dashboard-card {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+.dark .dashboard-card {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.dashboard-card:hover {
+  border-color: var(--border-muted);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+}
+.dark .dashboard-card:hover {
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
 }
 
 /* GitHub-style code block */

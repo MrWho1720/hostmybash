@@ -1,28 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 import ThemeToggle from "./ThemeToggle";
-
-interface SidebarProps {
-  displayName: string;
-  username: string;
-  avatarUrl: string;
-}
 
 const navGroups = [
   {
-    label: "Workspace",
+    label: "Navigation",
     items: [
       {
         href: "/scripts",
-        label: "My Scripts",
+        label: "Dashboard",
         icon: (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="16 18 22 12 16 6" />
-            <polyline points="8 6 2 12 8 18" />
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="7" height="9" rx="1" />
+            <rect x="14" y="3" width="7" height="5" rx="1" />
+            <rect x="14" y="12" width="7" height="9" rx="1" />
+            <rect x="3" y="16" width="7" height="5" rx="1" />
           </svg>
         ),
       },
@@ -30,7 +24,7 @@ const navGroups = [
         href: "/scripts/new",
         label: "New Script",
         icon: (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="9" />
             <line x1="12" y1="8" x2="12" y2="16" />
             <line x1="8" y1="12" x2="16" y2="12" />
@@ -41,7 +35,7 @@ const navGroups = [
         href: "/starred",
         label: "Starred",
         icon: (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
         ),
@@ -55,24 +49,19 @@ const navGroups = [
         href: "/explore",
         label: "Explore",
         icon: (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         ),
       },
-    ],
-  },
-  {
-    label: "Account",
-    items: [
       {
-        href: "/settings",
-        label: "Settings",
+        href: "/docs",
+        label: "Documentation",
         icon: (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
           </svg>
         ),
       },
@@ -80,54 +69,8 @@ const navGroups = [
   },
 ];
 
-function Avatar({ src, displayName }: { src: string; displayName: string }) {
-  const [errored, setErrored] = useState(false);
-
-  if (errored) {
-    return (
-      <div
-        style={{
-          width: 32, height: 32,
-          borderRadius: "50%",
-          background: "var(--bg-elevated)",
-          border: "1px solid var(--border)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 13, fontWeight: 600,
-          color: "var(--text-muted)",
-          flexShrink: 0,
-        }}
-      >
-        {displayName.charAt(0).toUpperCase()}
-      </div>
-    );
-  }
-
-  return (
-    <Image
-      src={src}
-      alt={displayName}
-      width={32}
-      height={32}
-      style={{
-        width: 32, height: 32,
-        borderRadius: "50%",
-        objectFit: "cover",
-        flexShrink: 0,
-        border: "1px solid var(--border)",
-      }}
-      onError={() => setErrored(true)}
-      unoptimized
-    />
-  );
-}
-
-export default function Sidebar({ displayName, username, avatarUrl }: SidebarProps) {
+export default function Sidebar() {
   const pathname = usePathname();
-
-  async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    window.location.href = "/login";
-  }
 
   function isActive(href: string) {
     if (href === "/scripts") {
@@ -142,24 +85,25 @@ export default function Sidebar({ displayName, username, avatarUrl }: SidebarPro
   return (
     <aside
       style={{
-        width: 240,
+        width: "260px",
         flexShrink: 0,
-        background: "var(--sidebar-bg)",
-        borderRight: "1px solid var(--sidebar-border)",
+        background: "var(--bg-inset)",
+        borderRight: "1px solid var(--border)",
         display: "flex",
         flexDirection: "column",
         height: "100vh",
         position: "sticky",
         top: 0,
-        overflowY: "auto",
         transition: "background 0.2s ease",
       }}
     >
       {/* ── Logo ── */}
       <div
         style={{
-          padding: "20px 16px 16px",
-          borderBottom: "1px solid var(--sidebar-border)",
+          padding: "24px 24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
         <Link
@@ -167,178 +111,146 @@ export default function Sidebar({ displayName, username, avatarUrl }: SidebarPro
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 10,
+            gap: 12,
             textDecoration: "none",
           }}
         >
-          {/* Terminal icon */}
+          {/* Logo Icon */}
           <div
             style={{
-              width: 30,
-              height: 30,
-              borderRadius: 7,
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border)",
+              width: 32,
+              height: 32,
+              borderRadius: "8px",
+              background: "var(--accent)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               flexShrink: 0,
+              boxShadow: "0 2px 4px rgba(59, 130, 246, 0.2)"
             }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
               <polyline points="4 17 10 11 4 5" />
               <line x1="12" y1="19" x2="20" y2="19" />
             </svg>
           </div>
           <div>
-            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "var(--text-heading)", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
-              HostMyBash
-            </p>
-            <p style={{ margin: 0, fontSize: 10, color: "var(--text-faint)", letterSpacing: "0.04em", fontFamily: "var(--font-mono)", lineHeight: 1.4 }}>
-              SCRIPT HOSTING
+            <p style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "var(--text-heading)", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
+              Nolito
             </p>
           </div>
         </Link>
+        <ThemeToggle />
+      </div>
+
+      <div style={{ padding: "0 24px" }}>
+        {/* Search placeholder */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: "10px", background: "var(--bg-surface)", border: "1px solid var(--border)", color: "var(--text-muted)"
+        }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <span style={{ fontSize: "13px" }}>Search</span>
+          <span style={{ marginLeft: "auto", fontSize: "11px", background: "var(--bg-elevated)", padding: "2px 6px", borderRadius: "4px" }}>/</span>
+        </div>
       </div>
 
       {/* ── Navigation ── */}
-      <nav style={{ flex: 1, padding: "12px 8px", overflowY: "auto" }}>
+      <nav style={{ flex: 1, padding: "24px 16px", overflowY: "auto" }}>
         {navGroups.map((group, gi) => (
-          <div key={gi} style={{ marginBottom: 20 }}>
+          <div key={gi} style={{ marginBottom: 32 }}>
             <p
               style={{
-                margin: "0 0 4px 8px",
-                fontSize: 10,
+                margin: "0 0 12px 12px",
+                fontSize: 11,
                 fontWeight: 600,
-                letterSpacing: "0.08em",
+                letterSpacing: "0.06em",
                 color: "var(--text-faint)",
                 textTransform: "uppercase",
-                fontFamily: "var(--font-mono)",
               }}
             >
               {group.label}
             </p>
-            {group.items.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    padding: "7px 10px",
-                    borderRadius: 7,
-                    fontSize: 13,
-                    fontWeight: active ? 500 : 400,
-                    color: active ? "var(--nav-active-text)" : "var(--text-muted)",
-                    background: active ? "var(--nav-active-bg)" : "transparent",
-                    textDecoration: "none",
-                    transition: "background 0.12s ease, color 0.12s ease",
-                    marginBottom: 2,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!active) {
-                      (e.currentTarget as HTMLAnchorElement).style.background = "var(--nav-hover-bg)";
-                      (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-heading)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!active) {
-                      (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
-                      (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-muted)";
-                    }
-                  }}
-                >
-                  <span style={{ opacity: active ? 1 : 0.7, flexShrink: 0 }}>{item.icon}</span>
-                  {item.label}
-                </Link>
-              );
-            })}
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {group.items.map((item) => {
+                const active = isActive(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      padding: "10px 12px",
+                      borderRadius: "10px",
+                      fontSize: 14,
+                      fontWeight: active ? 600 : 500,
+                      color: active ? "var(--text-heading)" : "var(--text-muted)",
+                      background: active ? "var(--bg-surface)" : "transparent",
+                      textDecoration: "none",
+                      transition: "all 0.2s ease",
+                      boxShadow: active ? "0 2px 4px rgba(0, 0, 0, 0.02), 0 0 0 1px var(--border)" : "none",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!active) {
+                        (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-heading)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!active) {
+                        (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-muted)";
+                      }
+                    }}
+                  >
+                    <span style={{ color: active ? "var(--text-heading)" : "var(--text-muted)", transition: "color 0.2s ease" }}>
+                      {item.icon}
+                    </span>
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         ))}
       </nav>
 
-      {/* ── Footer ── */}
-      <div
-        style={{
-          borderTop: "1px solid var(--sidebar-border)",
-          padding: "12px 8px",
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-        }}
-      >
-        {/* Theme toggle */}
-        <ThemeToggle />
-
-        {/* User row */}
-        <Link
-          href="/settings"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            padding: "7px 10px",
-            borderRadius: 7,
-            textDecoration: "none",
-            transition: "background 0.12s ease",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.background = "var(--nav-hover-bg)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
-          }}
-        >
-          <Avatar src={avatarUrl} displayName={displayName} />
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 500, color: "var(--text-heading)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.3 }}>
-              {displayName}
-            </p>
-            <p style={{ margin: 0, fontSize: 11, color: "var(--text-faint)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "var(--font-mono)", lineHeight: 1.4 }}>
-              @{username}
-            </p>
+      {/* Upgrade Plan Widget */}
+      <div style={{ padding: "24px 16px" }}>
+        <div style={{
+          background: "linear-gradient(135deg, #a855f7 0%, #6366f1 100%)",
+          borderRadius: "16px",
+          padding: "20px 16px",
+          color: "#fff",
+          textAlign: "center"
+        }}>
+          <div style={{ display: "inline-flex", padding: "8px", background: "rgba(255,255,255,0.2)", borderRadius: "10px", marginBottom: "12px" }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
           </div>
-        </Link>
-
-        {/* Sign out */}
-        <button
-          type="button"
-          onClick={handleLogout}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            padding: "7px 10px",
-            borderRadius: 7,
-            fontSize: 13,
-            color: "var(--text-faint)",
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            textAlign: "left",
-            width: "100%",
-            transition: "color 0.12s ease, background 0.12s ease",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color = "var(--danger)";
-            (e.currentTarget as HTMLButtonElement).style.background = "var(--danger-bg)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color = "var(--text-faint)";
-            (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-          Sign Out
-        </button>
+          <h4 style={{ margin: "0 0 8px", fontSize: "14px", fontWeight: 700 }}>View + Event Limit</h4>
+          <p style={{ margin: "0 0 16px", fontSize: "11px", opacity: 0.9 }}>225,948/500,000 Monthly Limit</p>
+          <div style={{ background: "rgba(255,255,255,0.3)", height: "4px", borderRadius: "2px", marginBottom: "16px", overflow: "hidden" }}>
+            <div style={{ background: "#fff", width: "45%", height: "100%", borderRadius: "2px" }} />
+          </div>
+          <button style={{
+            width: "100%", padding: "10px", borderRadius: "24px", background: "#fff", color: "#6366f1", border: "none", fontWeight: 600, fontSize: "13px", cursor: "pointer", marginBottom: "8px"
+          }}>
+            Learn more
+          </button>
+          <button style={{
+            width: "100%", padding: "10px", borderRadius: "24px", background: "#111827", color: "#fff", border: "none", fontWeight: 600, fontSize: "13px", cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "space-between"
+          }}>
+            <span style={{flex: 1}}>Upgrade plan</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
       </div>
+
     </aside>
   );
 }
