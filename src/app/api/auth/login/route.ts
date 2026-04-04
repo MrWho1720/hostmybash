@@ -34,14 +34,14 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "Invalid email or password" },
+        { code: "NO_ACCOUNT", error: "No account found with that email address" },
         { status: 401 }
       );
     }
 
     if (!user.isActive) {
       return NextResponse.json(
-        { error: "Account is deactivated" },
+        { code: "DEACTIVATED", error: "This account has been deactivated" },
         { status: 403 }
       );
     }
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     const validPassword = await verifyPassword(password, user.passwordHash);
     if (!validPassword) {
       return NextResponse.json(
-        { error: "Invalid email or password" },
+        { code: "WRONG_PASSWORD", error: "Incorrect password" },
         { status: 401 }
       );
     }

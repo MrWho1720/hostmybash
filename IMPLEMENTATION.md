@@ -12,10 +12,10 @@
 - [x] Field-level error highlighting (red border on the failing field)
 - [x] Show success state before redirect
 
-## Phase 3: Fix Login UX
-- [ ] Clear error messages per scenario (no account, wrong password, deactivated)
-- [ ] Loading spinner on submit button
-- [ ] Redirect to intended page after login
+## Phase 3: Fix Login UX ✅
+- [x] Clear error messages per scenario (no account, wrong password, deactivated)
+- [x] Loading spinner on submit button
+- [x] Redirect to intended page after login
 
 ## Phase 4: Profile API & Settings Page
 - [ ] `GET /api/auth/me` — return full profile (avatar, bio, username, email, displayName)
