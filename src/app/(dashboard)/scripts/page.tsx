@@ -25,12 +25,21 @@ interface ActivityEvent {
 }
 
 const EVENT_VERBS: Record<string, string> = {
-  created_script: "Created",
-  updated_script: "Updated",
-  deleted_script: "Deleted",
-  starred_script: "Starred",
-  unstarred_script: "Unstarred",
-  forked_script: "Forked",
+  created_script:  "Created",
+  updated_script:  "Updated",
+  deleted_script:  "Deleted",
+  starred_script:  "Starred",
+  unstarred_script:"Unstarred",
+  forked_script:   "Forked",
+};
+
+const EVENT_COLOR: Record<string, string> = {
+  created_script:  "var(--success)",
+  updated_script:  "var(--accent)",
+  deleted_script:  "var(--danger)",
+  starred_script:  "var(--warning)",
+  unstarred_script:"var(--text-faint)",
+  forked_script:   "var(--accent-text)",
 };
 
 function timeAgo(date: string): string {
@@ -45,16 +54,52 @@ function timeAgo(date: string): string {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
+function VisibilityBadge({ v }: { v: string }) {
+  const className =
+    v === "public"   ? "badge badge-public" :
+    v === "private"  ? "badge badge-private" :
+    "badge badge-unlisted";
+  return <span className={className}>{v}</span>;
+}
+
+function ScriptIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text-faint)", flexShrink: 0, marginTop: 2 }}>
+      <polyline points="16 18 22 12 16 6" />
+      <polyline points="8 6 2 12 8 18" />
+    </svg>
+  );
+}
+
+function ForkIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <line x1="6" y1="3" x2="6" y2="15" />
+      <circle cx="18" cy="6" r="3" />
+      <circle cx="6" cy="18" r="3" />
+      <path d="M18 9a9 9 0 0 1-9 9" />
+    </svg>
+  );
+}
+
+function StarIcon({ filled = false }: { filled?: boolean }) {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  );
+}
+
 export default function ScriptsPage() {
-  const [scripts, setScripts] = useState<Script[]>([]);
+  const [scripts, setScripts]   = useState<Script[]>([]);
   const [activity, setActivity] = useState<ActivityEvent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState("");
 
   useEffect(() => {
     Promise.all([
       fetch("/api/scripts").then((r) => r.json()),
-      fetch("/api/activity?limit=8").then((r) => r.json()).catch(() => ({ events: [] })),
+      fetch("/api/activity?limit=10").then((r) => r.json()).catch(() => ({ events: [] })),
     ])
       .then(([scriptsData, activityData]) => {
         setScripts(scriptsData.scripts || []);
@@ -64,82 +109,151 @@ export default function ScriptsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const visibilityBadge = (v: string) => {
-    const colors: Record<string, string> = {
-      private: "bg-elevated text-muted",
-      public: "bg-success/15 text-success",
-      unlisted: "bg-warning/15 text-warning",
-    };
-    return (
-      <span className={`px-2 py-0.5 rounded text-xs font-medium ${colors[v] || ""}`}>
-        {v}
-      </span>
-    );
-  };
-
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-semibold text-heading tracking-tight">My Scripts</h2>
+    <div style={{ maxWidth: 900 }}>
+      {/* ── Page header ── */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+        <div>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: "var(--text-heading)", letterSpacing: "-0.02em" }}>
+            My Scripts
+          </h1>
+          <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--text-muted)" }}>
+            Manage and deploy your terminal-ready automations.
+          </p>
+        </div>
         <Link
           href="/scripts/new"
-          className="px-4 py-2 bg-accent hover:bg-accent-hover text-white rounded-lg text-sm font-medium transition-colors"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "8px 16px",
+            borderRadius: 8,
+            background: "var(--accent)",
+            color: "#fff",
+            fontSize: 13,
+            fontWeight: 500,
+            textDecoration: "none",
+            transition: "background 0.15s ease",
+            flexShrink: 0,
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "var(--accent-hover)"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "var(--accent)"; }}
         >
-          + New Script
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          New Script
         </Link>
       </div>
 
-      {error ? (
-        <p className="text-danger">{error}</p>
-      ) : loading ? (
-        <div className="flex items-center justify-center h-40">
-          <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+      {/* ── Error ── */}
+      {error && (
+        <div style={{ padding: "12px 16px", background: "var(--danger-bg)", border: "1px solid var(--danger)", borderRadius: 8, color: "var(--danger)", fontSize: 13, marginBottom: 16 }}>
+          {error}
         </div>
-      ) : (
-        <div className="flex gap-6">
+      )}
+
+      {/* ── Loading ── */}
+      {loading && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 160 }}>
+          <div style={{ width: 20, height: 20, border: "2px solid var(--border)", borderTopColor: "var(--accent)", borderRadius: "50%" }} className="animate-spin" />
+        </div>
+      )}
+
+      {/* ── Content ── */}
+      {!loading && !error && (
+        <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
           {/* Scripts list */}
-          <div className="flex-1 min-w-0">
+          <div style={{ flex: 1, minWidth: 0 }}>
             {scripts.length === 0 ? (
-              <div className="text-center py-16 border border-dashed border-edge rounded-lg text-faint">
-                <p className="text-base mb-2">No scripts yet</p>
-                <p className="text-sm">Create your first script to get started.</p>
+              /* Empty state */
+              <div
+                style={{
+                  border: "1px dashed var(--border)",
+                  borderRadius: 10,
+                  padding: "48px 24px",
+                  textAlign: "center",
+                }}
+              >
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto 12px" }}>
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
+                <p style={{ margin: "0 0 6px", fontSize: 15, fontWeight: 500, color: "var(--text-muted)" }}>No scripts yet</p>
+                <p style={{ margin: 0, fontSize: 13, color: "var(--text-faint)" }}>
+                  Create your first script to get started.
+                </p>
               </div>
             ) : (
-              <div className="grid gap-3">
-                {scripts.map((s) => (
+              /* Script cards */
+              <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                {scripts.map((s, i) => (
                   <Link
                     key={s.id}
                     href={`/scripts/${s.id}`}
-                    className="block bg-surface border border-edge rounded-lg p-4 hover:border-muted/30 transition-colors"
+                    style={{
+                      display: "block",
+                      padding: "14px 16px",
+                      background: "var(--bg-surface)",
+                      border: "1px solid var(--border)",
+                      borderRadius: i === 0 ? "10px 10px 0 0" : i === scripts.length - 1 ? "0 0 10px 10px" : "0",
+                      marginTop: i === 0 ? 0 : -1,
+                      textDecoration: "none",
+                      transition: "background 0.12s ease, z-index 0s",
+                      position: "relative",
+                      zIndex: 0,
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLAnchorElement).style.background = "var(--bg-elevated)";
+                      (e.currentTarget as HTMLAnchorElement).style.zIndex = "1";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLAnchorElement).style.background = "var(--bg-surface)";
+                      (e.currentTarget as HTMLAnchorElement).style.zIndex = "0";
+                    }}
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-heading font-medium">{s.name}</h3>
-                        {s.forkedFromId && (
-                          <svg className="w-3.5 h-3.5 text-faint" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                          </svg>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                      <ScriptIcon />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        {/* Name row */}
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 3 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+                            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-heading)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              {s.name}
+                            </span>
+                            {s.forkedFromId && (
+                              <span style={{ color: "var(--text-faint)", flexShrink: 0 }}>
+                                <ForkIcon />
+                              </span>
+                            )}
+                          </div>
+                          <VisibilityBadge v={s.visibility} />
+                        </div>
+
+                        {/* Description */}
+                        {s.description && (
+                          <p style={{ margin: "0 0 8px", fontSize: 13, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {s.description}
+                          </p>
                         )}
+
+                        {/* Metadata row */}
+                        <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 12, color: "var(--text-faint)" }}>
+                          <span style={{ fontFamily: "var(--font-mono)" }}>/{s.slug}</span>
+                          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            <StarIcon />
+                            {s.starCount}
+                          </span>
+                          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            <ForkIcon />
+                            {s.forkCount}
+                          </span>
+                          <span>{s.runCount} runs</span>
+                          <span style={{ marginLeft: "auto" }}>{timeAgo(s.updatedAt)}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        {visibilityBadge(s.visibility)}
-                      </div>
-                    </div>
-                    {s.description && (
-                      <p className="text-sm text-muted line-clamp-1 mb-2">
-                        {s.description}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-4 text-xs text-faint">
-                      <span className="font-mono">/{s.slug}</span>
-                      <span className="flex items-center gap-1">
-                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                        </svg>
-                        {s.starCount}
-                      </span>
-                      <span>{s.forkCount} forks</span>
-                      <span>{s.runCount} runs</span>
                     </div>
                   </Link>
                 ))}
@@ -149,19 +263,33 @@ export default function ScriptsPage() {
 
           {/* Activity sidebar */}
           {activity.length > 0 && (
-            <div className="w-72 shrink-0 hidden xl:block">
-              <h3 className="text-sm font-medium text-heading mb-3">Recent Activity</h3>
-              <div className="space-y-3">
-                {activity.map((event) => {
+            <div style={{ width: 240, flexShrink: 0 }}>
+              <h3 style={{ margin: "0 0 12px", fontSize: 12, fontWeight: 600, color: "var(--text-faint)", textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "var(--font-mono)" }}>
+                Recent Activity
+              </h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+                {activity.map((event, i) => {
                   const verb = EVENT_VERBS[event.type] || event.type;
                   const name = event.script?.name ?? (event.metadata?.name as string) ?? "a script";
+                  const color = EVENT_COLOR[event.type] || "var(--text-muted)";
+                  const isLast = i === activity.length - 1;
                   return (
-                    <div key={event.id} className="text-sm">
-                      <p className="text-body">
-                        <span className="text-muted">{verb}</span>{" "}
-                        <span className="text-heading">{name}</span>
-                      </p>
-                      <p className="text-xs text-faint">{timeAgo(event.createdAt)}</p>
+                    <div key={event.id} style={{ display: "flex", gap: 12, paddingBottom: isLast ? 0 : 12, position: "relative" }}>
+                      {/* Timeline line */}
+                      {!isLast && (
+                        <div style={{ position: "absolute", left: 5, top: 14, bottom: 0, width: 1, background: "var(--border)" }} />
+                      )}
+                      {/* Dot */}
+                      <div style={{ width: 11, height: 11, borderRadius: "50%", background: color, flexShrink: 0, marginTop: 3, position: "relative", zIndex: 1 }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ margin: "0 0 2px", fontSize: 12, color: "var(--text-body)", lineHeight: 1.4 }}>
+                          <span style={{ color: "var(--text-muted)" }}>{verb}</span>{" "}
+                          <span style={{ color: "var(--text-heading)", fontWeight: 500 }}>{name}</span>
+                        </p>
+                        <p style={{ margin: 0, fontSize: 11, color: "var(--text-faint)", fontFamily: "var(--font-mono)" }}>
+                          {timeAgo(event.createdAt)}
+                        </p>
+                      </div>
                     </div>
                   );
                 })}

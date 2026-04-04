@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface Script {
   id: string;
@@ -16,23 +17,80 @@ interface Script {
   forkedFromId: string | null;
 }
 
+function StarIcon({ filled = false }: { filled?: boolean }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  );
+}
+
+function ForkIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <line x1="6" y1="3" x2="6" y2="15" />
+      <circle cx="18" cy="6" r="3" />
+      <circle cx="6" cy="18" r="3" />
+      <path d="M18 9a9 9 0 0 1-9 9" />
+    </svg>
+  );
+}
+
+function EditIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14H6L5 6" />
+      <path d="M10 11v6M14 11v6" />
+      <path d="M9 6V4h6v2" />
+    </svg>
+  );
+}
+
+function CopyIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
 export default function ScriptDetailPage() {
   const { id } = useParams();
-  const router = useRouter();
-  const [script, setScript] = useState<Script | null>(null);
-  const [editing, setEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [copied, setCopied] = useState(false);
-  const [username, setUsername] = useState("");
-  const [starred, setStarred] = useState(false);
+  const router  = useRouter();
+
+  const [script,      setScript]      = useState<Script | null>(null);
+  const [editing,     setEditing]     = useState(false);
+  const [saving,      setSaving]      = useState(false);
+  const [error,       setError]       = useState("");
+  const [copied,      setCopied]      = useState(false);
+  const [username,    setUsername]    = useState("");
+  const [starred,     setStarred]     = useState(false);
   const [starLoading, setStarLoading] = useState(false);
 
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
+  const [name,        setName]        = useState("");
+  const [slug,        setSlug]        = useState("");
   const [description, setDescription] = useState("");
-  const [content, setContent] = useState("");
-  const [visibility, setVisibility] = useState("public");
+  const [content,     setContent]     = useState("");
+  const [visibility,  setVisibility]  = useState("public");
 
   useEffect(() => {
     fetch(`/api/scripts/${id}`)
@@ -53,22 +111,21 @@ export default function ScriptDetailPage() {
 
     fetch("/api/auth/me")
       .then((r) => r.json())
-      .then((data) => {
-        if (data.username) setUsername(data.username);
-      })
+      .then((data) => { if (data.username) setUsername(data.username); })
       .catch(() => {});
 
-    // Check star status
     fetch(`/api/scripts/${id}/star`)
       .then((r) => r.json())
       .then((data) => setStarred(data.starred))
       .catch(() => {});
   }, [id]);
 
-  const mainHost = typeof window !== "undefined" ? window.location.hostname : "endever.in";
+  const mainHost   = typeof window !== "undefined" ? window.location.hostname : "hostmybash.com";
   const curlCommand = username && script
     ? `bash <(curl -s https://${username}.${mainHost}/${script.slug})`
     : "";
+
+  const lineCount = script ? script.content.split("\n").length : 0;
 
   function handleCopy() {
     if (!curlCommand) return;
@@ -83,8 +140,8 @@ export default function ScriptDetailPage() {
     setStarLoading(true);
     try {
       const method = starred ? "DELETE" : "PUT";
-      const res = await fetch(`/api/scripts/${id}/star`, { method });
-      const data = await res.json();
+      const res    = await fetch(`/api/scripts/${id}/star`, { method });
+      const data   = await res.json();
       setStarred(data.starred);
       if (script) {
         setScript({
@@ -98,7 +155,7 @@ export default function ScriptDetailPage() {
 
   async function handleFork() {
     try {
-      const res = await fetch(`/api/scripts/${id}/fork`, { method: "POST" });
+      const res  = await fetch(`/api/scripts/${id}/fork`, { method: "POST" });
       const data = await res.json();
       if (res.ok && data.script) {
         router.push(`/scripts/${data.script.id}`);
@@ -113,20 +170,14 @@ export default function ScriptDetailPage() {
   async function handleSave() {
     setError("");
     setSaving(true);
-
     try {
       const res = await fetch(`/api/scripts/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, slug, description: description || undefined, content, visibility }),
       });
-
       const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Failed to save");
-        return;
-      }
-
+      if (!res.ok) { setError(data.error || "Failed to save"); return; }
       setScript(data.script);
       setEditing(false);
     } catch {
@@ -142,151 +193,231 @@ export default function ScriptDetailPage() {
     if (res.ok) router.push("/scripts");
   }
 
-  if (!script && error) return <p className="text-danger">{error}</p>;
+  /* ─── Loading / Error states ─── */
+  if (!script && error) {
+    return (
+      <div style={{ padding: "32px 0", color: "var(--danger)", fontSize: 14 }}>{error}</div>
+    );
+  }
   if (!script) {
     return (
-      <div className="flex items-center justify-center h-40">
-        <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 160 }}>
+        <div style={{ width: 20, height: 20, border: "2px solid var(--border)", borderTopColor: "var(--accent)", borderRadius: "50%" }} className="animate-spin" />
       </div>
     );
   }
 
+  const visibilityColor =
+    script.visibility === "public"   ? "var(--success)"  :
+    script.visibility === "private"  ? "var(--text-muted)" :
+    "var(--warning)";
+
+  /* ─── Shared button style ─── */
+  const btnBase: React.CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 6,
+    padding: "6px 12px",
+    borderRadius: 7,
+    fontSize: 13,
+    fontWeight: 500,
+    cursor: "pointer",
+    border: "1px solid var(--border)",
+    transition: "background 0.12s ease, border-color 0.12s ease, color 0.12s ease",
+    textDecoration: "none",
+    background: "var(--bg-elevated)",
+    color: "var(--text-muted)",
+  };
+
   return (
-    <div className="max-w-4xl">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-6 gap-4">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-2xl font-semibold text-heading tracking-tight">{script.name}</h2>
+    <div style={{ maxWidth: 880 }} className="animate-fade-in">
+      {/* ── Breadcrumb ── */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, fontSize: 13, color: "var(--text-muted)" }}>
+        <Link href="/scripts" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}>
+          Scripts
+        </Link>
+        <span style={{ color: "var(--text-faint)" }}>/</span>
+        <span style={{ color: "var(--text-heading)", fontWeight: 500 }}>{script.name}</span>
+        {script.forkedFromId && (
+          <>
+            <span style={{ color: "var(--text-faint)" }}>·</span>
+            <span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--text-faint)", fontSize: 12 }}>
+              <ForkIcon /> forked
+            </span>
+          </>
+        )}
+      </div>
+
+      {/* ── Title + Actions ── */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 16 }}>
+        <div style={{ minWidth: 0 }}>
+          <h1 style={{ margin: "0 0 6px", fontSize: 22, fontWeight: 700, color: "var(--text-heading)", letterSpacing: "-0.02em" }}>
+            {script.name}
+          </h1>
           {script.description && (
-            <p className="text-muted mt-1">{script.description}</p>
-          )}
-          {script.forkedFromId && (
-            <p className="text-xs text-faint mt-1 flex items-center gap-1">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-              </svg>
-              Forked
+            <p style={{ margin: "0 0 10px", fontSize: 14, color: "var(--text-muted)" }}>
+              {script.description}
             </p>
           )}
-          <div className="flex items-center gap-4 mt-3 text-sm text-faint">
-            <span className="capitalize">{script.visibility}</span>
-            <span className="flex items-center gap-1">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-              </svg>
+          {/* Stats row */}
+          <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 12, color: "var(--text-faint)" }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, background: "var(--bg-elevated)", border: "1px solid var(--border)", color: visibilityColor, fontSize: 11, fontWeight: 500 }}>
+              {script.visibility}
+            </span>
+            <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <StarIcon />
               {script.starCount}
             </span>
-            <span>{script.forkCount} forks</span>
+            <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <ForkIcon />
+              {script.forkCount} forks
+            </span>
             <span>{script.runCount} runs</span>
-            <span className="font-mono">/{script.slug}</span>
+            <span style={{ fontFamily: "var(--font-mono)" }}>/{script.slug}</span>
           </div>
         </div>
 
         {/* Action buttons */}
-        <div className="flex gap-2 shrink-0">
+        <div style={{ display: "flex", gap: 8, flexShrink: 0, alignItems: "center" }}>
           <button
             type="button"
             onClick={toggleStar}
             disabled={starLoading}
-            className={`px-3 py-2 rounded-lg text-sm transition-colors border flex items-center gap-1.5 ${
-              starred
-                ? "bg-warning/10 border-warning/30 text-warning"
-                : "bg-elevated border-edge text-muted hover:text-heading"
-            }`}
+            style={{
+              ...btnBase,
+              color: starred ? "var(--warning)" : "var(--text-muted)",
+              borderColor: starred ? "color-mix(in srgb, var(--warning) 40%, transparent)" : "var(--border)",
+              background: starred ? "var(--warning-bg)" : "var(--bg-elevated)",
+            }}
           >
-            <svg className="w-4 h-4" fill={starred ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-            </svg>
+            <StarIcon filled={starred} />
             {starred ? "Starred" : "Star"}
           </button>
+
           <button
             type="button"
             onClick={handleFork}
-            className="px-3 py-2 bg-elevated border border-edge text-muted hover:text-heading rounded-lg text-sm transition-colors flex items-center gap-1.5"
+            style={btnBase}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-heading)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-muted)"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"; }}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-            </svg>
+            <ForkIcon />
             Fork
           </button>
+
           <button
             type="button"
             onClick={() => setEditing(!editing)}
-            className="px-3 py-2 bg-elevated border border-edge text-muted hover:text-heading rounded-lg text-sm transition-colors"
+            style={{
+              ...btnBase,
+              color: editing ? "var(--text-heading)" : "var(--text-muted)",
+              borderColor: editing ? "var(--accent)" : "var(--border)",
+              background: editing ? "var(--accent-subtle)" : "var(--bg-elevated)",
+            }}
           >
+            <EditIcon />
             {editing ? "Cancel" : "Edit"}
           </button>
+
           <button
             type="button"
             onClick={handleDelete}
-            className="px-3 py-2 bg-danger/10 text-danger hover:bg-danger/20 rounded-lg text-sm transition-colors"
+            style={{
+              ...btnBase,
+              color: "var(--danger)",
+              borderColor: "color-mix(in srgb, var(--danger) 30%, transparent)",
+              background: "var(--danger-bg)",
+            }}
           >
+            <TrashIcon />
             Delete
           </button>
         </div>
       </div>
 
+      {/* ── Error banner ── */}
       {error && (
-        <div className="mb-4 p-3 bg-danger/10 border border-danger/30 rounded-lg text-danger text-sm">
+        <div style={{ padding: "12px 16px", background: "var(--danger-bg)", border: "1px solid color-mix(in srgb, var(--danger) 40%, transparent)", borderRadius: 8, color: "var(--danger)", fontSize: 13, marginBottom: 16 }}>
           {error}
         </div>
       )}
 
-      {/* Curl command */}
+      {/* ── Curl command block ── */}
       {curlCommand && script.visibility !== "private" && (
-        <div className="mb-6 bg-surface border border-edge rounded-lg p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-muted">Run this script:</span>
+        <div className="terminal-block" style={{ marginBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ff5f57" }} />
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#febc2e" }} />
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#28c840" }} />
+              <span style={{ marginLeft: 6, fontSize: 11, color: "var(--text-faint)", fontFamily: "var(--font-mono)" }}>bash</span>
+            </div>
             <button
               type="button"
               onClick={handleCopy}
-              className="text-xs px-3 py-1 bg-elevated border border-edge text-muted rounded-md hover:text-heading transition-colors"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 5,
+                padding: "4px 10px",
+                borderRadius: 6,
+                fontSize: 12,
+                color: copied ? "var(--success)" : "var(--text-faint)",
+                background: "transparent",
+                border: "1px solid var(--border)",
+                cursor: "pointer",
+                transition: "color 0.15s ease, border-color 0.15s ease",
+              }}
             >
+              {copied ? <CheckIcon /> : <CopyIcon />}
               {copied ? "Copied!" : "Copy"}
             </button>
           </div>
-          <code className="block text-sm text-code font-mono bg-page rounded-md p-3">
-            {curlCommand}
+          <code style={{ fontSize: 13, letterSpacing: "0.01em" }}>
+            $ {curlCommand}
           </code>
         </div>
       )}
 
+      {/* ── Edit form / Code viewer ── */}
       {editing ? (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>
-              <label className="block text-sm text-body mb-1">Name</label>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--text-muted)", marginBottom: 6, letterSpacing: "0.02em" }}>Name</label>
               <input
+                className="input-field"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-2.5 bg-surface border border-edge rounded-lg text-heading focus:outline-none focus:ring-2 focus:ring-accent"
+                placeholder="my-script"
               />
             </div>
             <div>
-              <label className="block text-sm text-body mb-1">Slug</label>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--text-muted)", marginBottom: 6, letterSpacing: "0.02em" }}>Slug</label>
               <input
+                className="input-field"
                 value={slug}
+                style={{ fontFamily: "var(--font-mono)" }}
                 onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
-                className="w-full px-4 py-2.5 bg-surface border border-edge rounded-lg text-heading font-mono focus:outline-none focus:ring-2 focus:ring-accent"
+                placeholder="my-script"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm text-body mb-1">Description</label>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--text-muted)", marginBottom: 6 }}>Description</label>
             <input
+              className="input-field"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-4 py-2.5 bg-surface border border-edge rounded-lg text-heading focus:outline-none focus:ring-2 focus:ring-accent"
+              placeholder="Optional description…"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-body mb-1">Visibility</label>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--text-muted)", marginBottom: 6 }}>Visibility</label>
             <select
+              className="input-field"
               value={visibility}
               onChange={(e) => setVisibility(e.target.value)}
-              className="w-full px-4 py-2.5 bg-surface border border-edge rounded-lg text-heading focus:outline-none focus:ring-2 focus:ring-accent"
             >
               <option value="public">Public</option>
               <option value="unlisted">Unlisted</option>
@@ -295,31 +426,134 @@ export default function ScriptDetailPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-body mb-1">Script Content</label>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--text-muted)", marginBottom: 6 }}>Script Content</label>
             <textarea
+              className="input-field"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={20}
-              className="w-full px-4 py-3 bg-surface border border-edge rounded-lg text-code font-mono text-sm focus:outline-none focus:ring-2 focus:ring-accent resize-y"
+              style={{ fontFamily: "var(--font-mono)", fontSize: 13, resize: "vertical", color: "var(--code)" }}
+              placeholder="#!/bin/bash"
             />
           </div>
 
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="px-6 py-2.5 bg-accent hover:bg-accent-hover text-white rounded-lg font-medium transition-colors disabled:opacity-50"
-          >
-            {saving ? "Saving..." : "Save Changes"}
-          </button>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving}
+              style={{
+                padding: "9px 20px",
+                borderRadius: 8,
+                background: "var(--accent)",
+                color: "#fff",
+                fontSize: 13,
+                fontWeight: 500,
+                border: "none",
+                cursor: saving ? "not-allowed" : "pointer",
+                opacity: saving ? 0.6 : 1,
+                transition: "background 0.15s ease",
+              }}
+            >
+              {saving ? "Saving…" : "Save Changes"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              style={{
+                padding: "9px 16px",
+                borderRadius: 8,
+                background: "var(--bg-elevated)",
+                color: "var(--text-muted)",
+                fontSize: 13,
+                fontWeight: 500,
+                border: "1px solid var(--border)",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       ) : (
-        <div className="bg-surface border border-edge rounded-lg overflow-hidden">
-          <div className="px-4 py-2 bg-elevated text-xs text-faint font-mono border-b border-edge">
-            {script.slug}.sh
+        /* ── GitHub file viewer ── */
+        <div className="gh-code-block">
+          {/* Tab bar */}
+          <div className="gh-code-header">
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              {/* File tab */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "5px 12px",
+                  borderRadius: "6px 6px 0 0",
+                  background: "var(--bg-surface)",
+                  border: "1px solid var(--border)",
+                  borderBottom: "1px solid var(--bg-surface)",
+                  marginBottom: -1,
+                  position: "relative",
+                  zIndex: 1,
+                  color: "var(--text-body)",
+                }}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
+                {script.slug}.sh
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span>{lineCount} lines</span>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(script.content).catch(() => {});
+                }}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 5,
+                  padding: "3px 8px",
+                  borderRadius: 5,
+                  fontSize: 11,
+                  color: "var(--text-faint)",
+                  background: "transparent",
+                  border: "1px solid var(--border)",
+                  cursor: "pointer",
+                }}
+              >
+                <CopyIcon />
+                Raw
+              </button>
+            </div>
           </div>
-          <pre className="p-4 text-sm text-code font-mono overflow-x-auto whitespace-pre-wrap">
-            {script.content}
-          </pre>
+
+          {/* Code body with line numbers */}
+          <div style={{ display: "flex", overflowX: "auto" }}>
+            {/* Line numbers */}
+            <div className="line-numbers">
+              {script.content.split("\n").map((_, i) => (
+                <span key={i} style={{ lineHeight: "21px" }}>{i + 1}</span>
+              ))}
+            </div>
+            {/* Code content */}
+            <pre
+              style={{
+                flex: 1,
+                margin: 0,
+                padding: "16px 20px",
+                fontFamily: "var(--font-mono)",
+                fontSize: 13,
+                color: "var(--code)",
+                lineHeight: "21px",
+                background: "var(--code-bg)",
+                whiteSpace: "pre",
+                overflowX: "visible",
+                minWidth: 0,
+              }}
+            >{script.content}</pre>
+          </div>
         </div>
       )}
     </div>
