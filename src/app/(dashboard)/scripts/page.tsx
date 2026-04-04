@@ -16,11 +16,13 @@ interface Script {
 export default function ScriptsPage() {
   const [scripts, setScripts] = useState<Script[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetch("/api/scripts")
       .then((r) => r.json())
       .then((data) => setScripts(data.scripts || []))
+      .catch(() => setError("Failed to load scripts"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -49,7 +51,9 @@ export default function ScriptsPage() {
         </Link>
       </div>
 
-      {loading ? (
+      {error ? (
+        <p className="text-red-400">{error}</p>
+      ) : loading ? (
         <p className="text-gray-400">Loading...</p>
       ) : scripts.length === 0 ? (
         <div className="text-center py-12 text-gray-500">

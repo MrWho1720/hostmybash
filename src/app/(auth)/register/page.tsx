@@ -285,7 +285,7 @@ export default function RegisterPage() {
             )}
             {username && usernameStatus === "available" && (
               <p className="text-xs text-gray-500 mt-1">
-                Your scripts: https://{username}.endever.in/script-name
+                Your scripts: https://{username}.{typeof window !== "undefined" ? window.location.hostname : "endever.in"}/script-name
               </p>
             )}
           </div>

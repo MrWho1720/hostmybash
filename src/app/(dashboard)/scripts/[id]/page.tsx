@@ -41,8 +41,11 @@ export default function ScriptDetailPage() {
           setDescription(data.script.description || "");
           setContent(data.script.content);
           setVisibility(data.script.visibility);
+        } else {
+          setError(data.error || "Script not found");
         }
-      });
+      })
+      .catch(() => setError("Failed to load script"));
 
     // Get current user's username for the curl command
     fetch("/api/auth/me")
@@ -53,15 +56,17 @@ export default function ScriptDetailPage() {
       .catch(() => {});
   }, [id]);
 
+  const mainHost = typeof window !== "undefined" ? window.location.hostname : "endever.in";
   const curlCommand = username && script
-    ? `bash <(curl -s https://${username}.endever.in/${script.slug})`
+    ? `bash <(curl -s https://${username}.${mainHost}/${script.slug})`
     : "";
 
   function handleCopy() {
     if (!curlCommand) return;
-    navigator.clipboard.writeText(curlCommand);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    navigator.clipboard.writeText(curlCommand).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {});
   }
 
   async function handleSave() {
@@ -96,6 +101,7 @@ export default function ScriptDetailPage() {
     if (res.ok) router.push("/scripts");
   }
 
+  if (!script && error) return <p className="text-red-400">{error}</p>;
   if (!script) return <p className="text-gray-400">Loading...</p>;
 
   return (
@@ -115,12 +121,14 @@ export default function ScriptDetailPage() {
         </div>
         <div className="flex gap-2">
           <button
+            type="button"
             onClick={() => setEditing(!editing)}
             className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-sm transition-colors"
           >
             {editing ? "Cancel" : "Edit"}
           </button>
           <button
+            type="button"
             onClick={handleDelete}
             className="px-4 py-2 bg-red-900/50 hover:bg-red-900 text-red-300 rounded-lg text-sm transition-colors"
           >
@@ -141,6 +149,7 @@ export default function ScriptDetailPage() {
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-gray-400">Run this script:</span>
             <button
+              type="button"
               onClick={handleCopy}
               className="text-xs px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded transition-colors"
             >

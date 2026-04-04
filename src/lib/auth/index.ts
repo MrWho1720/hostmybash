@@ -15,7 +15,7 @@ export const lucia = new Lucia(adapter, {
       sameSite: "lax", // lax needed for cross-subdomain cookies
       domain:
         process.env.NODE_ENV === "production"
-          ? ".endever.in" // shared across subdomains
+          ? `.${process.env.MAIN_HOST || "endever.in"}` // shared across subdomains
           : undefined,
     },
   },

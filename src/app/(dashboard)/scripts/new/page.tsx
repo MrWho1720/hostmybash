@@ -88,7 +88,7 @@ export default function NewScriptPage() {
           />
           {slug && (
             <p className="text-xs text-gray-500 mt-1">
-              {`bash <(curl -s https://username.endever.in/${slug})`}
+              {`bash <(curl -s https://username.${typeof window !== "undefined" ? window.location.hostname : "endever.in"}/${slug})`}
             </p>
           )}
         </div>

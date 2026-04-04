@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -32,7 +32,6 @@ const ERROR_MESSAGES: Record<ErrorCode, { title: string; hint: string }> = {
 
 // Inner component that uses useSearchParams (needs Suspense wrapper)
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [email, setEmail] = useState("");
@@ -41,8 +40,9 @@ function LoginForm() {
   const [highlightField, setHighlightField] = useState<"email" | "password" | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Read `?from=` for post-login redirect
-  const redirectTo = searchParams.get("from") || "/scripts";
+  // Read `?from=` for post-login redirect (validated to prevent open redirect)
+  const rawFrom = searchParams.get("from") || "/scripts";
+  const redirectTo = rawFrom.startsWith("/") && !rawFrom.startsWith("//") ? rawFrom : "/scripts";
 
   // Clear field highlight when user starts editing
   useEffect(() => {
@@ -75,9 +75,8 @@ function LoginForm() {
         return;
       }
 
-      // Success — redirect to intended page
-      router.push(redirectTo);
-      router.refresh();
+      // Success — hard redirect so the new session cookie is sent on the next request
+      window.location.href = redirectTo;
     } catch {
       setErrorCode("NETWORK");
     } finally {

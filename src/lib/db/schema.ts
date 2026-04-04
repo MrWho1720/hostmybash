@@ -60,5 +60,7 @@ export const scripts = pgTable(
     // Each user's slugs must be unique
     uniqueIndex("idx_scripts_owner_slug").on(table.ownerId, table.slug),
     index("idx_scripts_owner").on(table.ownerId),
+    index("idx_scripts_owner_visibility").on(table.ownerId, table.visibility),
+    index("idx_scripts_updated").on(table.updatedAt),
   ]
 );

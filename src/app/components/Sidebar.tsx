@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 interface SidebarProps {
@@ -49,12 +49,10 @@ function Avatar({
 
 export default function Sidebar({ displayName, username, avatarUrl }: SidebarProps) {
   const pathname = usePathname();
-  const router   = useRouter();
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
-    router.refresh();
+    window.location.href = "/login";
   }
 
   return (
@@ -129,6 +127,7 @@ export default function Sidebar({ displayName, username, avatarUrl }: SidebarPro
         </Link>
 
         <button
+          type="button"
           onClick={handleLogout}
           className="w-full px-3 py-2 text-sm text-gray-500 hover:text-red-400 hover:bg-red-900/10 rounded-lg transition-colors text-left"
         >
