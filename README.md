@@ -3,7 +3,7 @@
 A script hosting platform — like pastebin for bash scripts. Host scripts, get a URL, run them anywhere with `curl`.
 
 ```bash
-curl https://yourname.endever.in/install-nginx | bash
+bash <(curl -s https://yourname.endever.in/install-your-script)
 ```
 
 ---
