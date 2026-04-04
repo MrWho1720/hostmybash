@@ -4,6 +4,9 @@ import type { NextRequest } from "next/server";
 // The main domain — requests here go to the dashboard
 const MAIN_HOST = process.env.MAIN_HOST || "endever.in";
 
+// Paths on the main domain that require authentication
+const PROTECTED_PATHS = ["/scripts", "/dashboard", "/settings", "/nodes"];
+
 export function proxy(request: NextRequest) {
   const host = request.headers.get("host") || "";
   const hostname = host.split(":")[0]; // strip port
@@ -45,6 +48,24 @@ export function proxy(request: NextRequest) {
     }
   }
 
+  // ── Auth guard (main domain only) ──────────────────────
+  const { pathname } = request.nextUrl;
+  const isProtected = PROTECTED_PATHS.some(
+    (p) => pathname === p || pathname.startsWith(p + "/")
+  );
+
+  if (isProtected) {
+    const hasSession = request.cookies
+      .getAll()
+      .some((c) => c.name.startsWith("auth_session") && c.value.length > 0);
+
+    if (!hasSession) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("from", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
   return NextResponse.next();
 }
 
@@ -54,3 +75,4 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };
+
