@@ -136,7 +136,7 @@ export default function Sidebar() {
           </div>
           <div>
             <p style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "var(--text-heading)", letterSpacing: "-0.01em", lineHeight: 1.2 }}>
-              Nolito
+              HostMyBash
             </p>
           </div>
         </Link>
@@ -245,8 +245,8 @@ export default function Sidebar() {
             width: "100%", padding: "10px", borderRadius: "24px", background: "#111827", color: "#fff", border: "none", fontWeight: 600, fontSize: "13px", cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "space-between"
           }}>
-            <span style={{flex: 1}}>Upgrade plan</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            <span style={{ flex: 1 }}>Upgrade plan</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
           </button>
         </div>
       </div>
