@@ -11,7 +11,6 @@ interface Props {
   params: Promise<{ username: string }>;
 }
 
-// ─── Data fetching ────────────────────────────────────────
 async function getUserProfile(username: string) {
   const [user] = await db
     .select({
@@ -52,7 +51,6 @@ async function getUserProfile(username: string) {
   };
 }
 
-// ─── Metadata ─────────────────────────────────────────────
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
   const profile = await getUserProfile(username);
@@ -74,7 +72,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// ─── Helpers ──────────────────────────────────────────────
 function timeAgo(date: Date | string | null): string {
   if (!date) return "";
   const d = typeof date === "string" ? new Date(date) : date;
@@ -97,7 +94,6 @@ function joinDate(date: Date | string | null): string {
   return d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 }
 
-// ─── Page ─────────────────────────────────────────────────
 export default async function UserProfilePage({ params }: Props) {
   const { username } = await params;
   const profile = await getUserProfile(username);
@@ -107,21 +103,21 @@ export default async function UserProfilePage({ params }: Props) {
   const MAIN_HOST = process.env.MAIN_HOST || "endever.in";
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-page text-heading">
       {/* Top bar */}
-      <header className="border-b border-gray-800 bg-gray-900/60 backdrop-blur-sm sticky top-0 z-10">
+      <header className="border-b border-edge bg-surface/60 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-3 flex items-center justify-between">
           <Link
             href={`https://${MAIN_HOST}`}
-            className="text-sm font-semibold text-gray-300 hover:text-white transition-colors"
+            className="text-sm font-semibold text-body hover:text-heading transition-colors"
           >
             HostMyBash
           </Link>
           <Link
             href={`https://${MAIN_HOST}/login`}
-            className="text-sm text-gray-400 hover:text-white transition-colors"
+            className="text-sm text-muted hover:text-heading transition-colors"
           >
-            Sign in →
+            Sign in
           </Link>
         </div>
       </header>
@@ -129,34 +125,32 @@ export default async function UserProfilePage({ params }: Props) {
       <main className="max-w-4xl mx-auto px-6 py-12 space-y-10">
         {/* Profile card */}
         <section className="flex flex-col sm:flex-row items-start gap-6">
-          {/* Avatar */}
           <div className="shrink-0">
             <Image
               src={profile.avatarUrl}
               alt={profile.displayName}
               width={100}
               height={100}
-              className="w-24 h-24 rounded-full object-cover ring-2 ring-gray-700"
+              className="w-24 h-24 rounded-full object-cover ring-1 ring-edge"
               unoptimized
             />
           </div>
 
-          {/* Info */}
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold text-white leading-tight">
+            <h1 className="text-2xl font-semibold text-heading leading-tight tracking-tight">
               {profile.displayName}
             </h1>
-            <p className="text-gray-400 font-mono text-sm mt-0.5">
+            <p className="text-muted font-mono text-sm mt-0.5">
               @{profile.username}
             </p>
 
             {profile.bio && (
-              <p className="mt-3 text-gray-300 text-sm leading-relaxed max-w-xl">
+              <p className="mt-3 text-body text-sm leading-relaxed max-w-xl">
                 {profile.bio}
               </p>
             )}
 
-            <div className="flex items-center gap-4 mt-4 text-xs text-gray-500">
+            <div className="flex items-center gap-4 mt-4 text-xs text-faint">
               <span className="flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -176,10 +170,10 @@ export default async function UserProfilePage({ params }: Props) {
 
         {/* Scripts list */}
         <section>
-          <h2 className="text-lg font-semibold text-white mb-4">Public Scripts</h2>
+          <h2 className="text-lg font-semibold text-heading mb-4">Public Scripts</h2>
 
           {profile.scripts.length === 0 ? (
-            <div className="text-center py-16 border border-dashed border-gray-800 rounded-xl text-gray-600">
+            <div className="text-center py-16 border border-dashed border-edge rounded-lg text-faint">
               <p className="text-base">No public scripts yet.</p>
               <p className="text-sm mt-1">Check back later!</p>
             </div>
@@ -191,27 +185,27 @@ export default async function UserProfilePage({ params }: Props) {
                   <a
                     key={script.slug}
                     href={installUrl}
-                    className="group flex items-start justify-between gap-4 bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-xl px-5 py-4 transition-colors"
+                    className="group flex items-start justify-between gap-4 bg-surface border border-edge hover:border-muted/30 rounded-lg px-5 py-4 transition-colors"
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-white group-hover:text-blue-300 transition-colors truncate">
+                      <p className="font-medium text-heading group-hover:text-accent transition-colors truncate">
                         {script.name}
                       </p>
                       {script.description && (
-                        <p className="text-sm text-gray-500 mt-0.5 line-clamp-1">
+                        <p className="text-sm text-faint mt-0.5 line-clamp-1">
                           {script.description}
                         </p>
                       )}
-                      <p className="text-xs text-gray-700 font-mono mt-1">
+                      <p className="text-xs text-faint font-mono mt-1">
                         {`bash <(curl -s ${installUrl})`}
                       </p>
                     </div>
 
                     <div className="shrink-0 text-right space-y-1">
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-faint">
                         {script.runCount.toLocaleString()} runs
                       </p>
-                      <p className="text-xs text-gray-700">
+                      <p className="text-xs text-faint">
                         {timeAgo(script.updatedAt)}
                       </p>
                     </div>
@@ -223,11 +217,11 @@ export default async function UserProfilePage({ params }: Props) {
         </section>
 
         {/* Footer */}
-        <footer className="pt-6 border-t border-gray-800 text-center text-xs text-gray-600">
+        <footer className="pt-6 border-t border-edge text-center text-xs text-faint">
           Powered by{" "}
           <a
             href={`https://${MAIN_HOST}`}
-            className="hover:text-gray-400 transition-colors"
+            className="hover:text-muted transition-colors"
           >
             HostMyBash
           </a>

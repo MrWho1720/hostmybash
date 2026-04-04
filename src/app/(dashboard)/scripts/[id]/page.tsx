@@ -47,7 +47,6 @@ export default function ScriptDetailPage() {
       })
       .catch(() => setError("Failed to load script"));
 
-    // Get current user's username for the curl command
     fetch("/api/auth/me")
       .then((r) => r.json())
       .then((data) => {
@@ -101,19 +100,25 @@ export default function ScriptDetailPage() {
     if (res.ok) router.push("/scripts");
   }
 
-  if (!script && error) return <p className="text-red-400">{error}</p>;
-  if (!script) return <p className="text-gray-400">Loading...</p>;
+  if (!script && error) return <p className="text-danger">{error}</p>;
+  if (!script) {
+    return (
+      <div className="flex items-center justify-center h-40">
+        <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">{script.name}</h2>
+          <h2 className="text-2xl font-semibold text-heading tracking-tight">{script.name}</h2>
           {script.description && (
-            <p className="text-gray-400 mt-1">{script.description}</p>
+            <p className="text-muted mt-1">{script.description}</p>
           )}
-          <div className="flex items-center gap-3 mt-2 text-sm text-gray-500">
+          <div className="flex items-center gap-3 mt-2 text-sm text-faint">
             <span className="capitalize">{script.visibility}</span>
             <span>{script.runCount} runs</span>
             <span className="font-mono">/{script.slug}</span>
@@ -123,14 +128,14 @@ export default function ScriptDetailPage() {
           <button
             type="button"
             onClick={() => setEditing(!editing)}
-            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-sm transition-colors"
+            className="px-4 py-2 bg-elevated hover:bg-elevated/80 text-muted rounded-lg text-sm transition-colors border border-edge"
           >
             {editing ? "Cancel" : "Edit"}
           </button>
           <button
             type="button"
             onClick={handleDelete}
-            className="px-4 py-2 bg-red-900/50 hover:bg-red-900 text-red-300 rounded-lg text-sm transition-colors"
+            className="px-4 py-2 bg-danger/10 hover:bg-danger/20 text-danger rounded-lg text-sm transition-colors"
           >
             Delete
           </button>
@@ -138,25 +143,25 @@ export default function ScriptDetailPage() {
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm">
+        <div className="mb-4 p-3 bg-danger/10 border border-danger/30 rounded-lg text-danger text-sm">
           {error}
         </div>
       )}
 
       {/* Curl command */}
       {curlCommand && script.visibility !== "private" && (
-        <div className="mb-6 bg-gray-900 border border-gray-800 rounded-lg p-4">
+        <div className="mb-6 bg-surface border border-edge rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-400">Run this script:</span>
+            <span className="text-sm text-muted">Run this script:</span>
             <button
               type="button"
               onClick={handleCopy}
-              className="text-xs px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded transition-colors"
+              className="text-xs px-3 py-1 bg-elevated hover:bg-elevated/80 text-muted rounded-md transition-colors border border-edge"
             >
               {copied ? "Copied!" : "Copy"}
             </button>
           </div>
-          <code className="block text-sm text-green-400 font-mono bg-gray-950 rounded p-3">
+          <code className="block text-sm text-code font-mono bg-page rounded-md p-3">
             {curlCommand}
           </code>
         </div>
@@ -167,38 +172,38 @@ export default function ScriptDetailPage() {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-300 mb-1">Name</label>
+              <label className="block text-sm text-body mb-1">Name</label>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2.5 bg-surface border border-edge rounded-lg text-heading focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-300 mb-1">Slug</label>
+              <label className="block text-sm text-body mb-1">Slug</label>
               <input
                 value={slug}
                 onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
-                className="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2.5 bg-surface border border-edge rounded-lg text-heading font-mono focus:outline-none focus:ring-2 focus:ring-accent"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Description</label>
+            <label className="block text-sm text-body mb-1">Description</label>
             <input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2.5 bg-surface border border-edge rounded-lg text-heading focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Visibility</label>
+            <label className="block text-sm text-body mb-1">Visibility</label>
             <select
               value={visibility}
               onChange={(e) => setVisibility(e.target.value)}
-              className="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2.5 bg-surface border border-edge rounded-lg text-heading focus:outline-none focus:ring-2 focus:ring-accent"
             >
               <option value="public">Public</option>
               <option value="unlisted">Unlisted</option>
@@ -207,30 +212,30 @@ export default function ScriptDetailPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Script Content</label>
+            <label className="block text-sm text-body mb-1">Script Content</label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={20}
-              className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-green-400 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+              className="w-full px-4 py-3 bg-surface border border-edge rounded-lg text-code font-mono text-sm focus:outline-none focus:ring-2 focus:ring-accent resize-y"
             />
           </div>
 
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="px-6 py-2.5 bg-accent hover:bg-accent-hover text-white rounded-lg font-medium transition-colors disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
         </div>
       ) : (
         /* View mode */
-        <div className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
-          <div className="px-4 py-2 bg-gray-800 text-xs text-gray-400 font-mono">
+        <div className="bg-surface border border-edge rounded-lg overflow-hidden">
+          <div className="px-4 py-2 bg-elevated text-xs text-faint font-mono border-b border-edge">
             {script.slug}.sh
           </div>
-          <pre className="p-4 text-sm text-green-400 font-mono overflow-x-auto whitespace-pre-wrap">
+          <pre className="p-4 text-sm text-code font-mono overflow-x-auto whitespace-pre-wrap">
             {script.content}
           </pre>
         </div>

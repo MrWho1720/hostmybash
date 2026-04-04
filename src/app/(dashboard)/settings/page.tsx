@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 
-// ─── Types ────────────────────────────────────────────────
 interface Profile {
   id: string;
   email: string;
@@ -15,10 +14,9 @@ interface Profile {
 
 type FieldErrors = Record<string, string>;
 
-// ─── Helpers ──────────────────────────────────────────────
 function SuccessBadge({ message }: { message: string }) {
   return (
-    <div className="flex items-center gap-2 text-emerald-400 text-sm">
+    <div className="flex items-center gap-2 text-success text-sm">
       <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
       </svg>
@@ -29,16 +27,15 @@ function SuccessBadge({ message }: { message: string }) {
 
 function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null;
-  return <p className="text-xs text-red-400 mt-1">{msg}</p>;
+  return <p className="text-xs text-danger mt-1">{msg}</p>;
 }
 
 function inputClass(err?: string) {
-  return `w-full px-4 py-2.5 bg-gray-800 border rounded-lg text-white text-sm focus:outline-none focus:ring-2 transition-colors ${
-    err ? "border-red-500 focus:ring-red-500" : "border-gray-700 focus:ring-blue-500"
+  return `w-full px-4 py-2.5 bg-elevated border rounded-lg text-heading text-sm focus:outline-none focus:ring-2 transition-colors ${
+    err ? "border-danger focus:ring-danger" : "border-edge focus:ring-accent"
   }`;
 }
 
-// ─── Section wrapper ──────────────────────────────────────
 function Section({
   title,
   description,
@@ -49,11 +46,11 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+    <div className="bg-surface border border-edge rounded-lg p-6">
       <div className="mb-5">
-        <h2 className="text-base font-semibold text-white">{title}</h2>
+        <h2 className="text-base font-semibold text-heading">{title}</h2>
         {description && (
-          <p className="text-sm text-gray-500 mt-0.5">{description}</p>
+          <p className="text-sm text-faint mt-0.5">{description}</p>
         )}
       </div>
       {children}
@@ -61,7 +58,6 @@ function Section({
   );
 }
 
-// ─── Avatar ───────────────────────────────────────────────
 function AvatarPreview({
   src,
   displayName,
@@ -73,7 +69,7 @@ function AvatarPreview({
 
   if (errored) {
     return (
-      <div className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center text-2xl font-bold text-gray-400 shrink-0">
+      <div className="w-20 h-20 rounded-full bg-elevated flex items-center justify-center text-2xl font-bold text-muted shrink-0">
         {displayName.charAt(0).toUpperCase()}
       </div>
     );
@@ -85,26 +81,23 @@ function AvatarPreview({
       alt="Avatar"
       width={80}
       height={80}
-      className="w-20 h-20 rounded-full object-cover shrink-0 ring-2 ring-gray-700"
+      className="w-20 h-20 rounded-full object-cover shrink-0 ring-1 ring-edge"
       onError={() => setErrored(true)}
-      unoptimized // allow external URLs (Gravatar / custom)
+      unoptimized
     />
   );
 }
 
-// ─── Profile Section ──────────────────────────────────────
 function ProfileSection({ profile, onUpdate }: { profile: Profile; onUpdate: (p: Partial<Profile>) => void }) {
   const [displayName, setDisplayName] = useState(profile.displayName);
   const [bio, setBio] = useState(profile.bio ?? "");
   const [avatarUrl, setAvatarUrl] = useState(
-    // If it's a Gravatar URL, treat as empty (it's the fallback)
     profile.avatarUrl.includes("gravatar.com") ? "" : profile.avatarUrl
   );
   const [errors, setErrors] = useState<FieldErrors>({});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // Preview: live avatar URL or current Gravatar fallback
   const previewUrl = avatarUrl.trim() || profile.avatarUrl;
 
   async function handleSave(e: React.FormEvent) {
@@ -135,29 +128,27 @@ function ProfileSection({ profile, onUpdate }: { profile: Profile; onUpdate: (p:
   return (
     <Section title="Public Profile" description="This information may be visible to other users.">
       <form onSubmit={handleSave} className="space-y-5">
-        {/* Avatar row */}
         <div className="flex items-center gap-5">
           <AvatarPreview src={previewUrl} displayName={displayName} />
           <div className="flex-1">
-            <label className="block text-sm text-gray-300 mb-1">Avatar URL</label>
+            <label className="block text-sm text-body mb-1">Avatar URL</label>
             <input
               id="avatarUrl"
               type="url"
               value={avatarUrl}
               onChange={(e) => { setAvatarUrl(e.target.value); setErrors((p) => { const n = {...p}; delete n.avatarUrl; return n; }); }}
-              placeholder="https://… (leave blank to use Gravatar)"
+              placeholder="https://... (leave blank to use Gravatar)"
               className={inputClass(errors.avatarUrl)}
             />
             <FieldError msg={errors.avatarUrl} />
-            <p className="text-xs text-gray-600 mt-1">
+            <p className="text-xs text-faint mt-1">
               Leave blank to use your Gravatar ({profile.email})
             </p>
           </div>
         </div>
 
-        {/* Display name */}
         <div>
-          <label className="block text-sm text-gray-300 mb-1">Display Name</label>
+          <label className="block text-sm text-body mb-1">Display Name</label>
           <input
             id="displayName"
             type="text"
@@ -169,35 +160,33 @@ function ProfileSection({ profile, onUpdate }: { profile: Profile; onUpdate: (p:
           <FieldError msg={errors.displayName} />
         </div>
 
-        {/* Bio */}
         <div>
-          <label className="block text-sm text-gray-300 mb-1">
+          <label className="block text-sm text-body mb-1">
             Bio
-            <span className="ml-2 text-gray-600 font-normal text-xs">{bio.length}/300</span>
+            <span className="ml-2 text-faint font-normal text-xs">{bio.length}/300</span>
           </label>
           <textarea
             id="bio"
             value={bio}
             onChange={(e) => { setBio(e.target.value.slice(0, 300)); setErrors((p) => { const n = {...p}; delete n.bio; return n; }); }}
             rows={3}
-            placeholder="Tell people a little about yourself…"
+            placeholder="Tell people a little about yourself..."
             className={`${inputClass(errors.bio)} resize-none`}
           />
           <FieldError msg={errors.bio} />
         </div>
 
-        {/* Read-only fields */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-gray-500 mb-1">Username</label>
-            <div className="px-4 py-2.5 bg-gray-800/50 border border-gray-700/50 rounded-lg text-gray-400 text-sm font-mono">
+            <label className="block text-sm text-faint mb-1">Username</label>
+            <div className="px-4 py-2.5 bg-elevated/50 border border-edge/50 rounded-lg text-muted text-sm font-mono">
               @{profile.username}
             </div>
-            <p className="text-xs text-gray-600 mt-1">Username cannot be changed</p>
+            <p className="text-xs text-faint mt-1">Username cannot be changed</p>
           </div>
           <div>
-            <label className="block text-sm text-gray-500 mb-1">Email</label>
-            <div className="px-4 py-2.5 bg-gray-800/50 border border-gray-700/50 rounded-lg text-gray-400 text-sm truncate">
+            <label className="block text-sm text-faint mb-1">Email</label>
+            <div className="px-4 py-2.5 bg-elevated/50 border border-edge/50 rounded-lg text-muted text-sm truncate">
               {profile.email}
             </div>
           </div>
@@ -208,12 +197,12 @@ function ProfileSection({ profile, onUpdate }: { profile: Profile; onUpdate: (p:
           <button
             type="submit"
             disabled={saving}
-            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+            className="px-5 py-2 bg-accent hover:bg-accent-hover text-white text-sm rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
           >
             {saving ? (
               <>
                 <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
-                Saving…
+                Saving...
               </>
             ) : (
               "Save Profile"
@@ -225,7 +214,6 @@ function ProfileSection({ profile, onUpdate }: { profile: Profile; onUpdate: (p:
   );
 }
 
-// ─── Password Section ────────────────────────────────────
 function PasswordSection() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -241,7 +229,6 @@ function PasswordSection() {
     setErrors({});
     setSaved(false);
 
-    // Client-side confirm check
     if (newPassword !== confirmNewPassword) {
       setErrors({ confirmNewPassword: "New passwords do not match" });
       setSaving(false);
@@ -270,7 +257,6 @@ function PasswordSection() {
     setTimeout(() => setSaved(false), 3000);
   }
 
-  // Determine password strength
   const strength = newPassword.length === 0
     ? null
     : newPassword.length < 8
@@ -282,17 +268,17 @@ function PasswordSection() {
     : "good";
 
   const strengthConfig = {
-    weak:   { label: "Too short", color: "bg-red-500",    width: "w-1/4" },
-    fair:   { label: "Fair",      color: "bg-amber-500",  width: "w-2/4" },
-    good:   { label: "Good",      color: "bg-blue-500",   width: "w-3/4" },
-    strong: { label: "Strong",    color: "bg-emerald-500",width: "w-full" },
+    weak:   { label: "Too short", color: "bg-danger",  text: "text-danger",  width: "w-1/4" },
+    fair:   { label: "Fair",      color: "bg-warning",  text: "text-warning",  width: "w-2/4" },
+    good:   { label: "Good",      color: "bg-accent",   text: "text-accent",   width: "w-3/4" },
+    strong: { label: "Strong",    color: "bg-success",  text: "text-success",  width: "w-full" },
   };
 
   return (
     <Section title="Change Password" description="Use a strong password you don't use anywhere else.">
       <form ref={formRef} onSubmit={handleSave} className="space-y-4">
         <div>
-          <label className="block text-sm text-gray-300 mb-1">Current Password</label>
+          <label className="block text-sm text-body mb-1">Current Password</label>
           <input
             id="currentPassword"
             type="password"
@@ -306,7 +292,7 @@ function PasswordSection() {
         </div>
 
         <div>
-          <label className="block text-sm text-gray-300 mb-1">New Password</label>
+          <label className="block text-sm text-body mb-1">New Password</label>
           <input
             id="newPassword"
             type="password"
@@ -317,13 +303,12 @@ function PasswordSection() {
             placeholder="At least 8 characters"
           />
           <FieldError msg={errors.newPassword} />
-          {/* Strength meter */}
           {strength && (
             <div className="mt-2 space-y-1">
-              <div className="h-1 w-full bg-gray-700 rounded-full overflow-hidden">
-                <div className={`h-full rounded-full transition-all duration-300 ${strengthConfig[strength].color} ${strengthConfig[strength].width}`} />
+              <div className="h-1 w-full bg-elevated rounded-full overflow-hidden">
+                <div className={`h-full rounded-full transition-all duration-200 ${strengthConfig[strength].color} ${strengthConfig[strength].width}`} />
               </div>
-              <p className={`text-xs ${strengthConfig[strength].color.replace("bg-", "text-")}`}>
+              <p className={`text-xs ${strengthConfig[strength].text}`}>
                 {strengthConfig[strength].label}
               </p>
             </div>
@@ -331,7 +316,7 @@ function PasswordSection() {
         </div>
 
         <div>
-          <label className="block text-sm text-gray-300 mb-1">Confirm New Password</label>
+          <label className="block text-sm text-body mb-1">Confirm New Password</label>
           <input
             id="confirmNewPassword"
             type="password"
@@ -343,7 +328,7 @@ function PasswordSection() {
             }}
             className={`${inputClass(errors.confirmNewPassword)} ${
               !errors.confirmNewPassword && confirmNewPassword && newPassword === confirmNewPassword
-                ? "border-emerald-500 focus:ring-emerald-500"
+                ? "border-success focus:ring-success"
                 : ""
             }`}
             placeholder="Repeat new password"
@@ -351,7 +336,7 @@ function PasswordSection() {
           {errors.confirmNewPassword ? (
             <FieldError msg={errors.confirmNewPassword} />
           ) : confirmNewPassword && newPassword === confirmNewPassword ? (
-            <p className="text-xs text-emerald-400 mt-1">✓ Passwords match</p>
+            <p className="text-xs text-success mt-1">Passwords match</p>
           ) : null}
         </div>
 
@@ -360,12 +345,12 @@ function PasswordSection() {
           <button
             type="submit"
             disabled={saving}
-            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+            className="px-5 py-2 bg-accent hover:bg-accent-hover text-white text-sm rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
           >
             {saving ? (
               <>
                 <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
-                Updating…
+                Updating...
               </>
             ) : (
               "Update Password"
@@ -377,7 +362,6 @@ function PasswordSection() {
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────
 export default function SettingsPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loadError, setLoadError] = useState(false);
@@ -394,7 +378,7 @@ export default function SettingsPage() {
 
   if (loadError) {
     return (
-      <div className="flex items-center justify-center h-64 text-gray-500 text-sm">
+      <div className="flex items-center justify-center h-64 text-faint text-sm">
         Failed to load profile. Please refresh.
       </div>
     );
@@ -403,7 +387,7 @@ export default function SettingsPage() {
   if (!profile) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -411,8 +395,8 @@ export default function SettingsPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-gray-500 text-sm mt-1">Manage your profile and account security</p>
+        <h1 className="text-2xl font-semibold text-heading tracking-tight">Settings</h1>
+        <p className="text-faint text-sm mt-1">Manage your profile and account security</p>
       </div>
 
       <ProfileSection

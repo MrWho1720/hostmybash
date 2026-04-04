@@ -53,30 +53,30 @@ export default function NewScriptPage() {
 
   return (
     <div className="max-w-3xl">
-      <h2 className="text-2xl font-bold text-white mb-6">New Script</h2>
+      <h2 className="text-2xl font-semibold text-heading mb-6 tracking-tight">New Script</h2>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm">
+        <div className="mb-4 p-3 bg-danger/10 border border-danger/30 rounded-lg text-danger text-sm">
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm text-gray-300 mb-1">Name</label>
+          <label className="block text-sm text-body mb-1">Name</label>
           <input
             name="name"
             type="text"
             required
             onChange={(e) => setSlug(toSlug(e.target.value))}
-            className="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2.5 bg-surface border border-edge rounded-lg text-heading focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
 
         <div>
-          <label className="block text-sm text-gray-300 mb-1">
+          <label className="block text-sm text-body mb-1">
             Slug
-            <span className="text-gray-500 ml-1">(URL path)</span>
+            <span className="text-faint ml-1">(URL path)</span>
           </label>
           <input
             name="slug"
@@ -84,32 +84,32 @@ export default function NewScriptPage() {
             required
             value={slug}
             onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
-            className="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2.5 bg-surface border border-edge rounded-lg text-heading font-mono focus:outline-none focus:ring-2 focus:ring-accent"
           />
           {slug && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-faint mt-1">
               {`bash <(curl -s https://username.${typeof window !== "undefined" ? window.location.hostname : "endever.in"}/${slug})`}
             </p>
           )}
         </div>
 
         <div>
-          <label className="block text-sm text-gray-300 mb-1">
+          <label className="block text-sm text-body mb-1">
             Description (optional)
           </label>
           <input
             name="description"
             type="text"
-            className="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2.5 bg-surface border border-edge rounded-lg text-heading focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
 
         <div>
-          <label className="block text-sm text-gray-300 mb-1">Visibility</label>
+          <label className="block text-sm text-body mb-1">Visibility</label>
           <select
             name="visibility"
             defaultValue="public"
-            className="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2.5 bg-surface border border-edge rounded-lg text-heading focus:outline-none focus:ring-2 focus:ring-accent"
           >
             <option value="public">Public</option>
             <option value="unlisted">Unlisted (accessible via URL only)</option>
@@ -118,7 +118,7 @@ export default function NewScriptPage() {
         </div>
 
         <div>
-          <label className="block text-sm text-gray-300 mb-1">
+          <label className="block text-sm text-body mb-1">
             Script Content
           </label>
           <textarea
@@ -126,12 +126,12 @@ export default function NewScriptPage() {
             required
             rows={16}
             placeholder={"#!/bin/bash\necho 'Hello, World!'"}
-            className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-green-400 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+            className="w-full px-4 py-3 bg-surface border border-edge rounded-lg text-code font-mono text-sm focus:outline-none focus:ring-2 focus:ring-accent resize-y"
           />
         </div>
 
-        <div className="p-3 bg-yellow-900/30 border border-yellow-800 rounded-lg">
-          <p className="text-xs text-yellow-300">
+        <div className="p-3 bg-warning/10 border border-warning/20 rounded-lg">
+          <p className="text-xs text-warning">
             Warning: Never run scripts from untrusted sources. Always review
             scripts before executing them.
           </p>
@@ -141,14 +141,14 @@ export default function NewScriptPage() {
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="px-6 py-2.5 bg-accent hover:bg-accent-hover text-white rounded-lg font-medium transition-colors disabled:opacity-50"
           >
             {loading ? "Creating..." : "Create Script"}
           </button>
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-6 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors"
+            className="px-6 py-2.5 bg-elevated hover:bg-elevated/80 text-muted rounded-lg transition-colors border border-edge"
           >
             Cancel
           </button>

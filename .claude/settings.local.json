@@ -45,7 +45,18 @@
       "Bash(bunx tsc:*)",
       "Read(//root/.bun/bin/**)",
       "Read(//usr/local/bin/**)",
-      "Bash(/root/.bun/bin/bun run:*)"
+      "Bash(/root/.bun/bin/bun run:*)",
+      "Bash(claude mcp:*)",
+      "mcp__stitch__list_projects",
+      "mcp__stitch__create_project",
+      "mcp__stitch__create_design_system",
+      "mcp__stitch__generate_screen_from_text",
+      "mcp__stitch__get_project",
+      "mcp__stitch__get_screen",
+      "mcp__stitch__list_screens",
+      "WebFetch(domain:contribution.usercontent.google.com)",
+      "Bash(npm run:*)",
+      "Bash(npx next:*)"
     ]
   }
 }

@@ -18,24 +18,20 @@ type UsernameStatus =
 export default function RegisterPage() {
   const router = useRouter();
 
-  // Form values
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // UI state
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [globalError, setGlobalError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>("idle");
 
-  // Debounce ref
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Real-time username availability check
   const checkUsername = useCallback(async (value: string) => {
     if (!value || value.length < 3) {
       setUsernameStatus(value.length > 0 ? "too_short" : "idle");
@@ -71,7 +67,6 @@ export default function RegisterPage() {
     };
   }, [username, checkUsername]);
 
-  // Clear field error when user starts typing
   function clearFieldError(field: string) {
     setFieldErrors((prev) => {
       if (!prev[field]) return prev;
@@ -85,7 +80,6 @@ export default function RegisterPage() {
     e.preventDefault();
     setGlobalError("");
 
-    // Client-side password confirmation check
     const clientErrors: FieldErrors = {};
     if (password !== confirmPassword) {
       clientErrors.confirmPassword = "Passwords do not match";
@@ -116,7 +110,6 @@ export default function RegisterPage() {
         return;
       }
 
-      // Show success state, then redirect
       setSuccess(true);
       setTimeout(() => {
         router.push("/scripts");
@@ -129,86 +122,59 @@ export default function RegisterPage() {
     }
   }
 
-  // Helper: get field border class
   function fieldBorder(field: string) {
     return fieldErrors[field]
-      ? "border-red-500 focus:ring-red-500"
-      : "border-gray-700 focus:ring-blue-500";
+      ? "border-danger focus:ring-danger"
+      : "border-edge focus:ring-accent";
   }
 
-  // Username status badge
   function renderUsernameStatus() {
     if (usernameStatus === "idle") return null;
     if (usernameStatus === "checking") {
       return (
-        <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-          <span className="inline-block w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-          Checking availability…
+        <p className="text-xs text-muted mt-1 flex items-center gap-1">
+          <span className="inline-block w-3 h-3 border-2 border-muted border-t-transparent rounded-full animate-spin" />
+          Checking availability...
         </p>
       );
     }
     if (usernameStatus === "available") {
-      return (
-        <p className="text-xs text-emerald-400 mt-1">
-          ✓ @{username} is available
-        </p>
-      );
+      return <p className="text-xs text-success mt-1">@{username} is available</p>;
     }
     if (usernameStatus === "taken") {
-      return (
-        <p className="text-xs text-red-400 mt-1">
-          ✗ @{username} is already taken
-        </p>
-      );
+      return <p className="text-xs text-danger mt-1">@{username} is already taken</p>;
     }
     if (usernameStatus === "reserved") {
-      return (
-        <p className="text-xs text-amber-400 mt-1">
-          ✗ This username is reserved
-        </p>
-      );
+      return <p className="text-xs text-warning mt-1">This username is reserved</p>;
     }
     if (usernameStatus === "too_short") {
-      return (
-        <p className="text-xs text-gray-500 mt-1">
-          Username must be at least 3 characters
-        </p>
-      );
+      return <p className="text-xs text-faint mt-1">Username must be at least 3 characters</p>;
     }
     if (usernameStatus === "invalid") {
-      return (
-        <p className="text-xs text-red-400 mt-1">
-          Only lowercase letters, numbers and hyphens (not at start/end)
-        </p>
-      );
+      return <p className="text-xs text-danger mt-1">Only lowercase letters, numbers and hyphens (not at start/end)</p>;
     }
     return null;
   }
 
-  // Success overlay
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-gray-900 rounded-xl p-10 border border-gray-800 flex flex-col items-center gap-4 text-center">
-          <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
+      <div className="min-h-screen bg-page flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-surface rounded-lg p-10 border border-edge flex flex-col items-center gap-4 text-center">
+          <div className="w-16 h-16 rounded-full bg-success/15 flex items-center justify-center">
             <svg
-              className="w-8 h-8 text-emerald-400"
+              className="w-8 h-8 text-success"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth={2}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 13l4 4L19 7"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-white">Account created!</h2>
-          <p className="text-gray-400">Redirecting you to your dashboard…</p>
-          <div className="w-48 h-1 bg-gray-800 rounded-full overflow-hidden mt-2">
-            <div className="h-full bg-emerald-500 rounded-full animate-progress" />
+          <h2 className="text-2xl font-semibold text-heading">Account created!</h2>
+          <p className="text-muted">Redirecting you to your dashboard...</p>
+          <div className="w-48 h-1 bg-elevated rounded-full overflow-hidden mt-2">
+            <div className="h-full bg-success rounded-full animate-progress" />
           </div>
         </div>
       </div>
@@ -216,25 +182,22 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-gray-900 rounded-xl p-8 border border-gray-800">
-        <h1 className="text-2xl font-bold text-white mb-1">Create Account</h1>
-        <p className="text-gray-400 mb-6 text-sm">
+    <div className="min-h-screen bg-page flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-surface rounded-lg p-8 border border-edge">
+        <h1 className="text-2xl font-semibold text-heading mb-1 tracking-tight">Create Account</h1>
+        <p className="text-muted mb-6 text-sm">
           Host your bash scripts on HostMyBash
         </p>
 
         {globalError && (
-          <div className="mb-4 p-3 bg-red-900/40 border border-red-700 rounded-lg text-red-300 text-sm">
+          <div className="mb-4 p-3 bg-danger/10 border border-danger/30 rounded-lg text-danger text-sm">
             {globalError}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-          {/* Display Name */}
           <div>
-            <label className="block text-sm text-gray-300 mb-1">
-              Display Name
-            </label>
+            <label className="block text-sm text-body mb-1">Display Name</label>
             <input
               id="displayName"
               name="displayName"
@@ -242,23 +205,17 @@ export default function RegisterPage() {
               required
               autoComplete="name"
               value={displayName}
-              onChange={(e) => {
-                setDisplayName(e.target.value);
-                clearFieldError("displayName");
-              }}
-              className={`w-full px-4 py-2.5 bg-gray-800 border rounded-lg text-white focus:outline-none focus:ring-2 transition-colors ${fieldBorder("displayName")}`}
+              onChange={(e) => { setDisplayName(e.target.value); clearFieldError("displayName"); }}
+              className={`w-full px-4 py-2.5 bg-elevated border rounded-lg text-heading focus:outline-none focus:ring-2 transition-colors ${fieldBorder("displayName")}`}
               placeholder="Jane Doe"
             />
             {fieldErrors.displayName && (
-              <p className="text-xs text-red-400 mt-1">
-                {fieldErrors.displayName}
-              </p>
+              <p className="text-xs text-danger mt-1">{fieldErrors.displayName}</p>
             )}
           </div>
 
-          {/* Username */}
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Username</label>
+            <label className="block text-sm text-body mb-1">Username</label>
             <input
               id="username"
               name="username"
@@ -273,26 +230,28 @@ export default function RegisterPage() {
                 setUsername(v);
                 clearFieldError("username");
               }}
-              className={`w-full px-4 py-2.5 bg-gray-800 border rounded-lg text-white font-mono focus:outline-none focus:ring-2 transition-colors ${fieldErrors.username ? "border-red-500 focus:ring-red-500" : usernameStatus === "available" ? "border-emerald-500 focus:ring-emerald-500" : usernameStatus === "taken" || usernameStatus === "reserved" ? "border-red-500 focus:ring-red-500" : "border-gray-700 focus:ring-blue-500"}`}
+              className={`w-full px-4 py-2.5 bg-elevated border rounded-lg text-heading font-mono focus:outline-none focus:ring-2 transition-colors ${
+                fieldErrors.username ? "border-danger focus:ring-danger"
+                : usernameStatus === "available" ? "border-success focus:ring-success"
+                : usernameStatus === "taken" || usernameStatus === "reserved" ? "border-danger focus:ring-danger"
+                : "border-edge focus:ring-accent"
+              }`}
               placeholder="yourname"
             />
             {fieldErrors.username ? (
-              <p className="text-xs text-red-400 mt-1">
-                {fieldErrors.username}
-              </p>
+              <p className="text-xs text-danger mt-1">{fieldErrors.username}</p>
             ) : (
               renderUsernameStatus()
             )}
             {username && usernameStatus === "available" && (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-faint mt-1">
                 Your scripts: https://{username}.{typeof window !== "undefined" ? window.location.hostname : "endever.in"}/script-name
               </p>
             )}
           </div>
 
-          {/* Email */}
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Email</label>
+            <label className="block text-sm text-body mb-1">Email</label>
             <input
               id="email"
               name="email"
@@ -300,21 +259,17 @@ export default function RegisterPage() {
               required
               autoComplete="email"
               value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                clearFieldError("email");
-              }}
-              className={`w-full px-4 py-2.5 bg-gray-800 border rounded-lg text-white focus:outline-none focus:ring-2 transition-colors ${fieldBorder("email")}`}
+              onChange={(e) => { setEmail(e.target.value); clearFieldError("email"); }}
+              className={`w-full px-4 py-2.5 bg-elevated border rounded-lg text-heading focus:outline-none focus:ring-2 transition-colors ${fieldBorder("email")}`}
               placeholder="you@example.com"
             />
             {fieldErrors.email && (
-              <p className="text-xs text-red-400 mt-1">{fieldErrors.email}</p>
+              <p className="text-xs text-danger mt-1">{fieldErrors.email}</p>
             )}
           </div>
 
-          {/* Password */}
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Password</label>
+            <label className="block text-sm text-body mb-1">Password</label>
             <input
               id="password"
               name="password"
@@ -326,26 +281,22 @@ export default function RegisterPage() {
               onChange={(e) => {
                 setPassword(e.target.value);
                 clearFieldError("password");
-                // Re-check confirm if already touched
                 if (confirmPassword && e.target.value === confirmPassword) {
                   clearFieldError("confirmPassword");
                 }
               }}
-              className={`w-full px-4 py-2.5 bg-gray-800 border rounded-lg text-white focus:outline-none focus:ring-2 transition-colors ${fieldBorder("password")}`}
+              className={`w-full px-4 py-2.5 bg-elevated border rounded-lg text-heading focus:outline-none focus:ring-2 transition-colors ${fieldBorder("password")}`}
               placeholder="At least 8 characters"
             />
             {fieldErrors.password ? (
-              <p className="text-xs text-red-400 mt-1">{fieldErrors.password}</p>
+              <p className="text-xs text-danger mt-1">{fieldErrors.password}</p>
             ) : (
-              <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
+              <p className="text-xs text-faint mt-1">Minimum 8 characters</p>
             )}
           </div>
 
-          {/* Confirm Password */}
           <div>
-            <label className="block text-sm text-gray-300 mb-1">
-              Confirm Password
-            </label>
+            <label className="block text-sm text-body mb-1">Confirm Password</label>
             <input
               id="confirmPassword"
               name="confirmPassword"
@@ -367,33 +318,29 @@ export default function RegisterPage() {
                   }));
                 }
               }}
-              className={`w-full px-4 py-2.5 bg-gray-800 border rounded-lg text-white focus:outline-none focus:ring-2 transition-colors ${
-                fieldErrors.confirmPassword
-                  ? "border-red-500 focus:ring-red-500"
-                  : confirmPassword && password === confirmPassword
-                  ? "border-emerald-500 focus:ring-emerald-500"
-                  : "border-gray-700 focus:ring-blue-500"
+              className={`w-full px-4 py-2.5 bg-elevated border rounded-lg text-heading focus:outline-none focus:ring-2 transition-colors ${
+                fieldErrors.confirmPassword ? "border-danger focus:ring-danger"
+                : confirmPassword && password === confirmPassword ? "border-success focus:ring-success"
+                : "border-edge focus:ring-accent"
               }`}
               placeholder="Re-enter your password"
             />
             {fieldErrors.confirmPassword ? (
-              <p className="text-xs text-red-400 mt-1">
-                {fieldErrors.confirmPassword}
-              </p>
+              <p className="text-xs text-danger mt-1">{fieldErrors.confirmPassword}</p>
             ) : confirmPassword && password === confirmPassword ? (
-              <p className="text-xs text-emerald-400 mt-1">✓ Passwords match</p>
+              <p className="text-xs text-success mt-1">Passwords match</p>
             ) : null}
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
+            className="w-full py-2.5 bg-accent hover:bg-accent-hover text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
           >
             {loading ? (
               <>
                 <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Creating account…
+                Creating account...
               </>
             ) : (
               "Create Account"
@@ -401,9 +348,9 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-400">
+        <p className="mt-6 text-center text-sm text-muted">
           Already have an account?{" "}
-          <Link href="/login" className="text-blue-400 hover:text-blue-300">
+          <Link href="/login" className="text-accent hover:text-accent-hover">
             Sign in
           </Link>
         </p>

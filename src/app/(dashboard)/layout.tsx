@@ -17,7 +17,7 @@ export default async function DashboardLayout({
   const avatarUrl = user.avatarUrl ?? getGravatarUrl(user.email, 80);
 
   return (
-    <div className="flex min-h-screen bg-gray-950">
+    <div className="flex min-h-screen bg-page">
       <Sidebar
         displayName={user.displayName}
         username={user.username}
