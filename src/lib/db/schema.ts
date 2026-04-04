@@ -18,6 +18,8 @@ export const users = pgTable(
     username: text("username").unique().notNull(),
     passwordHash: text("password_hash").notNull(),
     displayName: text("display_name").notNull(),
+    avatarUrl: text("avatar_url"),
+    bio: text("bio"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     isActive: boolean("is_active").default(true),
   },

@@ -13,8 +13,16 @@ export async function POST(request: NextRequest) {
     const parsed = registerSchema.safeParse(body);
 
     if (!parsed.success) {
+      // Map Zod errors to field-level errors
+      const fieldErrors: Record<string, string> = {};
+      for (const issue of parsed.error.issues) {
+        const field = issue.path[0] as string;
+        if (!fieldErrors[field]) {
+          fieldErrors[field] = issue.message;
+        }
+      }
       return NextResponse.json(
-        { error: parsed.error.issues[0].message },
+        { error: "Validation failed", fields: fieldErrors },
         { status: 400 }
       );
     }
@@ -23,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     if (RESERVED_USERNAMES.has(username)) {
       return NextResponse.json(
-        { error: "This username is not available" },
+        { error: "This username is reserved", fields: { username: "This username is reserved" } },
         { status: 400 }
       );
     }
@@ -37,8 +45,8 @@ export async function POST(request: NextRequest) {
 
     if (existingEmail) {
       return NextResponse.json(
-        { error: "Registration failed. Please try again." },
-        { status: 400 }
+        { error: "This email is already registered", fields: { email: "This email is already registered" } },
+        { status: 409 }
       );
     }
 
@@ -51,8 +59,8 @@ export async function POST(request: NextRequest) {
 
     if (existingUsername) {
       return NextResponse.json(
-        { error: "This username is not available" },
-        { status: 400 }
+        { error: "This username is already taken", fields: { username: "This username is already taken" } },
+        { status: 409 }
       );
     }
 

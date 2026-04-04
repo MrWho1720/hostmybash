@@ -24,6 +24,8 @@ export const lucia = new Lucia(adapter, {
       email: attributes.email,
       username: attributes.username,
       displayName: attributes.displayName,
+      avatarUrl: attributes.avatarUrl,
+      bio: attributes.bio,
     };
   },
 });
@@ -36,6 +38,9 @@ declare module "lucia" {
       username: string;
       displayName: string;
       display_name: string;
+      avatarUrl: string | null;
+      avatar_url: string | null;
+      bio: string | null;
     };
   }
 }
