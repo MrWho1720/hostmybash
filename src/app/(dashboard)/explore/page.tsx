@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface ExploreScript {
   id: string;
@@ -15,9 +16,68 @@ interface ExploreScript {
   updatedAt: string;
   ownerUsername: string;
   ownerDisplayName: string;
+  ownerAvatarUrl: string | null;
 }
 
 type SortMode = "trending" | "recent" | "stars" | "runs";
+
+function Avatar({ src, name }: { src: string | null; name: string }) {
+  const [errored, setErrored] = useState(false);
+
+  if (!src || errored) {
+    return (
+      <div
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: "50%",
+          background: "var(--bg-elevated)",
+          border: "1px solid var(--border)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 14,
+          fontWeight: 600,
+          color: "var(--text-muted)",
+          flexShrink: 0,
+        }}
+      >
+        {name.charAt(0).toUpperCase()}
+      </div>
+    );
+  }
+
+  return (
+    <Image
+      src={src}
+      alt={name}
+      width={36}
+      height={36}
+      style={{
+        width: 36,
+        height: 36,
+        borderRadius: "50%",
+        objectFit: "cover",
+        flexShrink: 0,
+        border: "1px solid var(--border)",
+      }}
+      onError={() => setErrored(true)}
+      unoptimized
+    />
+  );
+}
+
+function timeAgo(date: string): string {
+  const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  return `${Math.floor(days / 30)}mo ago`;
+}
 
 export default function ExplorePage() {
   const [scripts, setScripts] = useState<ExploreScript[]>([]);
@@ -31,7 +91,7 @@ export default function ExplorePage() {
     setLoading(true);
     const params = new URLSearchParams({
       sort: sortMode,
-      limit: "20",
+      limit: "30",
       offset: String(page),
     });
     if (search) params.set("q", search);
@@ -61,18 +121,6 @@ export default function ExplorePage() {
     return () => clearTimeout(timer);
   }, [query, sort, fetchScripts]);
 
-  function timeAgo(date: string): string {
-    const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-    if (seconds < 60) return "just now";
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    if (days < 30) return `${days}d ago`;
-    return `${Math.floor(days / 30)}mo ago`;
-  }
-
   const sortTabs: { key: SortMode; label: string }[] = [
     { key: "trending", label: "Trending" },
     { key: "recent", label: "Recent" },
@@ -81,39 +129,106 @@ export default function ExplorePage() {
   ];
 
   return (
-    <div className="max-w-4xl">
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-heading tracking-tight">Explore</h2>
-        <p className="text-muted text-sm mt-1">Discover public scripts from the community</p>
+    <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+      {/* Hero header */}
+      <div style={{ textAlign: "center", paddingTop: 16, paddingBottom: 32 }}>
+        <h1
+          style={{
+            margin: 0,
+            fontSize: 32,
+            fontWeight: 700,
+            color: "var(--text-heading)",
+            letterSpacing: "-0.03em",
+          }}
+        >
+          Discover Community Scripts
+        </h1>
+        <p
+          style={{
+            margin: "8px 0 0",
+            fontSize: 15,
+            color: "var(--text-muted)",
+          }}
+        >
+          Browse and search public bash scripts shared by the community
+        </p>
       </div>
 
-      {/* Search bar */}
-      <div className="mb-4">
-        <div className="relative">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-faint" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      {/* Big search bar */}
+      <div style={{ maxWidth: 640, margin: "0 auto 24px" }}>
+        <div style={{ position: "relative" }}>
+          <svg
+            style={{
+              position: "absolute",
+              left: 16,
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: 20,
+              height: 20,
+              color: "var(--text-faint)",
+            }}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search scripts..."
-            className="w-full pl-10 pr-4 py-2.5 bg-surface border border-edge rounded-lg text-heading text-sm focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-faint"
+            placeholder="Search all public scripts..."
+            style={{
+              width: "100%",
+              padding: "14px 20px 14px 48px",
+              background: "var(--bg-surface)",
+              border: "1px solid var(--border)",
+              borderRadius: 12,
+              color: "var(--text-heading)",
+              fontSize: 15,
+              outline: "none",
+              transition: "border-color 0.15s ease, box-shadow 0.15s ease",
+              fontFamily: "var(--font-sans)",
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = "var(--accent)";
+              e.currentTarget.style.boxShadow = "0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent)";
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = "var(--border)";
+              e.currentTarget.style.boxShadow = "none";
+            }}
           />
         </div>
       </div>
 
       {/* Sort tabs */}
-      <div className="flex gap-1 mb-6 border-b border-edge">
+      <div
+        style={{
+          display: "flex",
+          gap: 4,
+          marginBottom: 24,
+          borderBottom: "1px solid var(--border)",
+        }}
+      >
         {sortTabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => { setSort(tab.key); setOffset(0); }}
-            className={`px-4 py-2 text-sm transition-colors border-b-2 -mb-px ${
-              sort === tab.key
-                ? "border-accent text-accent"
-                : "border-transparent text-muted hover:text-heading"
-            }`}
+            style={{
+              padding: "8px 16px",
+              fontSize: 13,
+              fontWeight: sort === tab.key ? 500 : 400,
+              color: sort === tab.key ? "var(--accent-text)" : "var(--text-muted)",
+              background: "transparent",
+              border: "none",
+              borderBottom: sort === tab.key ? "2px solid var(--accent)" : "2px solid transparent",
+              marginBottom: -1,
+              cursor: "pointer",
+              transition: "color 0.12s ease",
+              fontFamily: "var(--font-sans)",
+            }}
           >
             {tab.label}
           </button>
@@ -122,79 +237,211 @@ export default function ExplorePage() {
 
       {/* Results */}
       {loading ? (
-        <div className="flex items-center justify-center h-40">
-          <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 200 }}>
+          <div
+            style={{
+              width: 24,
+              height: 24,
+              border: "2px solid var(--border)",
+              borderTopColor: "var(--accent)",
+              borderRadius: "50%",
+            }}
+            className="animate-spin"
+          />
         </div>
       ) : scripts.length === 0 ? (
-        <div className="text-center py-16 border border-dashed border-edge rounded-lg text-faint">
-          <p className="text-base mb-1">No scripts found</p>
-          <p className="text-sm">
+        <div
+          style={{
+            textAlign: "center",
+            padding: "64px 24px",
+            border: "1px dashed var(--border)",
+            borderRadius: 12,
+            color: "var(--text-faint)",
+          }}
+        >
+          <svg
+            width="36"
+            height="36"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.4}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ margin: "0 auto 12px", color: "var(--text-faint)" }}
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <p style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 500, color: "var(--text-muted)" }}>
+            No scripts found
+          </p>
+          <p style={{ margin: 0, fontSize: 13 }}>
             {query ? "Try a different search term." : "Be the first to publish a public script!"}
           </p>
         </div>
       ) : (
         <>
-          <div className="grid gap-3">
+          {/* 3-column card grid */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+              gap: 16,
+            }}
+          >
             {scripts.map((s) => (
-              <div
+              <Link
                 key={s.id}
-                className="bg-surface border border-edge rounded-lg p-4 hover:border-muted/30 transition-colors"
+                href={`/scripts/${s.id}`}
+                style={{
+                  display: "block",
+                  padding: 16,
+                  background: "var(--bg-surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 10,
+                  textDecoration: "none",
+                  transition: "border-color 0.15s ease, background 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--border-muted)";
+                  (e.currentTarget as HTMLAnchorElement).style.background = "var(--bg-elevated)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--border)";
+                  (e.currentTarget as HTMLAnchorElement).style.background = "var(--bg-surface)";
+                }}
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Link
-                        href={`/u/${s.ownerUsername}`}
-                        className="text-xs text-muted hover:text-accent font-mono"
-                      >
-                        @{s.ownerUsername}
-                      </Link>
-                      <span className="text-faint text-xs">/</span>
-                      <span className="text-heading font-medium text-sm">{s.name}</span>
-                    </div>
-                    {s.description && (
-                      <p className="text-sm text-muted line-clamp-2 mb-2">{s.description}</p>
-                    )}
-                    <div className="flex items-center gap-4 text-xs text-faint">
-                      <span className="flex items-center gap-1">
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                        </svg>
-                        {s.starCount}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                        </svg>
-                        {s.forkCount}
-                      </span>
-                      <span>{s.runCount} runs</span>
-                      <span>{timeAgo(s.updatedAt)}</span>
-                    </div>
+                {/* Top row: avatar + owner/name */}
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
+                  <Avatar src={s.ownerAvatarUrl} name={s.ownerDisplayName} />
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: "var(--text-heading)",
+                        lineHeight: 1.3,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {s.name}
+                    </p>
+                    <p
+                      style={{
+                        margin: "2px 0 0",
+                        fontSize: 12,
+                        color: "var(--text-faint)",
+                        fontFamily: "var(--font-mono)",
+                      }}
+                    >
+                      @{s.ownerUsername}
+                    </p>
                   </div>
                 </div>
-              </div>
+
+                {/* Description */}
+                {s.description && (
+                  <p
+                    style={{
+                      margin: "0 0 12px",
+                      fontSize: 13,
+                      color: "var(--text-muted)",
+                      lineHeight: 1.5,
+                      overflow: "hidden",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
+                    {s.description}
+                  </p>
+                )}
+
+                {/* Stats row */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 14,
+                    fontSize: 12,
+                    color: "var(--text-faint)",
+                  }}
+                >
+                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                    {s.starCount}
+                  </span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="6" y1="3" x2="6" y2="15" />
+                      <circle cx="18" cy="6" r="3" />
+                      <circle cx="6" cy="18" r="3" />
+                      <path d="M18 9a9 9 0 0 1-9 9" />
+                    </svg>
+                    {s.forkCount}
+                  </span>
+                  <span>{s.runCount} runs</span>
+                  <span style={{ marginLeft: "auto" }}>{timeAgo(s.updatedAt)}</span>
+                </div>
+              </Link>
             ))}
           </div>
 
           {/* Pagination */}
-          {total > 20 && (
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-edge">
-              <p className="text-xs text-faint">
-                Showing {offset + 1}–{Math.min(offset + 20, total)} of {total}
+          {total > 30 && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginTop: 24,
+                paddingTop: 16,
+                borderTop: "1px solid var(--border)",
+              }}
+            >
+              <p style={{ margin: 0, fontSize: 12, color: "var(--text-faint)" }}>
+                Showing {offset + 1}–{Math.min(offset + 30, total)} of {total}
               </p>
-              <div className="flex gap-2">
+              <div style={{ display: "flex", gap: 8 }}>
                 <button
-                  onClick={() => setOffset(Math.max(0, offset - 20))}
+                  onClick={() => setOffset(Math.max(0, offset - 30))}
                   disabled={offset === 0}
-                  className="px-3 py-1.5 text-xs bg-elevated border border-edge rounded-md text-muted hover:text-heading disabled:opacity-30 transition-colors"
+                  style={{
+                    padding: "6px 14px",
+                    fontSize: 12,
+                    background: "var(--bg-elevated)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 6,
+                    color: "var(--text-muted)",
+                    cursor: offset === 0 ? "default" : "pointer",
+                    opacity: offset === 0 ? 0.3 : 1,
+                    transition: "color 0.12s ease",
+                    fontFamily: "var(--font-sans)",
+                  }}
                 >
                   Previous
                 </button>
                 <button
-                  onClick={() => setOffset(offset + 20)}
-                  disabled={offset + 20 >= total}
-                  className="px-3 py-1.5 text-xs bg-elevated border border-edge rounded-md text-muted hover:text-heading disabled:opacity-30 transition-colors"
+                  onClick={() => setOffset(offset + 30)}
+                  disabled={offset + 30 >= total}
+                  style={{
+                    padding: "6px 14px",
+                    fontSize: 12,
+                    background: "var(--bg-elevated)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 6,
+                    color: "var(--text-muted)",
+                    cursor: offset + 30 >= total ? "default" : "pointer",
+                    opacity: offset + 30 >= total ? 0.3 : 1,
+                    transition: "color 0.12s ease",
+                    fontFamily: "var(--font-sans)",
+                  }}
                 >
                   Next
                 </button>
