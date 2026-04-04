@@ -77,4 +77,6 @@ export const RESERVED_USERNAMES = new Set([
   "status",
   "blog",
   "docs",
+  "explore",
+  "activity",
 ]);

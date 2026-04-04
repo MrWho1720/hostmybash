@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { scripts } from "@/lib/db/schema";
 import { requireAuth } from "@/lib/auth";
 import { createScriptSchema } from "@/lib/validation/schemas";
+import { trackActivity } from "@/lib/activity";
 import { eq, and, desc } from "drizzle-orm";
 
 export async function GET() {
@@ -66,6 +67,13 @@ export async function POST(request: NextRequest) {
         ownerId: user.id,
       })
       .returning();
+
+    trackActivity({
+      userId: user.id,
+      type: "created_script",
+      scriptId: script.id,
+      metadata: { name: script.name, visibility: script.visibility },
+    });
 
     return NextResponse.json({ script }, { status: 201 });
   } catch (error: any) {

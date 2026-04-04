@@ -11,6 +11,9 @@ interface Script {
   content: string;
   visibility: string;
   runCount: number;
+  starCount: number;
+  forkCount: number;
+  forkedFromId: string | null;
 }
 
 export default function ScriptDetailPage() {
@@ -22,8 +25,9 @@ export default function ScriptDetailPage() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [username, setUsername] = useState("");
+  const [starred, setStarred] = useState(false);
+  const [starLoading, setStarLoading] = useState(false);
 
-  // Form state
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
@@ -53,6 +57,12 @@ export default function ScriptDetailPage() {
         if (data.username) setUsername(data.username);
       })
       .catch(() => {});
+
+    // Check star status
+    fetch(`/api/scripts/${id}/star`)
+      .then((r) => r.json())
+      .then((data) => setStarred(data.starred))
+      .catch(() => {});
   }, [id]);
 
   const mainHost = typeof window !== "undefined" ? window.location.hostname : "endever.in";
@@ -66,6 +76,38 @@ export default function ScriptDetailPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }).catch(() => {});
+  }
+
+  async function toggleStar() {
+    if (starLoading) return;
+    setStarLoading(true);
+    try {
+      const method = starred ? "DELETE" : "PUT";
+      const res = await fetch(`/api/scripts/${id}/star`, { method });
+      const data = await res.json();
+      setStarred(data.starred);
+      if (script) {
+        setScript({
+          ...script,
+          starCount: data.starred ? script.starCount + 1 : Math.max(0, script.starCount - 1),
+        });
+      }
+    } catch {}
+    setStarLoading(false);
+  }
+
+  async function handleFork() {
+    try {
+      const res = await fetch(`/api/scripts/${id}/fork`, { method: "POST" });
+      const data = await res.json();
+      if (res.ok && data.script) {
+        router.push(`/scripts/${data.script.id}`);
+      } else {
+        setError(data.error || "Failed to fork");
+      }
+    } catch {
+      setError("Network error");
+    }
   }
 
   async function handleSave() {
@@ -112,30 +154,72 @@ export default function ScriptDetailPage() {
   return (
     <div className="max-w-4xl">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
+      <div className="flex items-start justify-between mb-6 gap-4">
+        <div className="min-w-0 flex-1">
           <h2 className="text-2xl font-semibold text-heading tracking-tight">{script.name}</h2>
           {script.description && (
             <p className="text-muted mt-1">{script.description}</p>
           )}
-          <div className="flex items-center gap-3 mt-2 text-sm text-faint">
+          {script.forkedFromId && (
+            <p className="text-xs text-faint mt-1 flex items-center gap-1">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              Forked
+            </p>
+          )}
+          <div className="flex items-center gap-4 mt-3 text-sm text-faint">
             <span className="capitalize">{script.visibility}</span>
+            <span className="flex items-center gap-1">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              </svg>
+              {script.starCount}
+            </span>
+            <span>{script.forkCount} forks</span>
             <span>{script.runCount} runs</span>
             <span className="font-mono">/{script.slug}</span>
           </div>
         </div>
-        <div className="flex gap-2">
+
+        {/* Action buttons */}
+        <div className="flex gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={toggleStar}
+            disabled={starLoading}
+            className={`px-3 py-2 rounded-lg text-sm transition-colors border flex items-center gap-1.5 ${
+              starred
+                ? "bg-warning/10 border-warning/30 text-warning"
+                : "bg-elevated border-edge text-muted hover:text-heading"
+            }`}
+          >
+            <svg className="w-4 h-4" fill={starred ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+            </svg>
+            {starred ? "Starred" : "Star"}
+          </button>
+          <button
+            type="button"
+            onClick={handleFork}
+            className="px-3 py-2 bg-elevated border border-edge text-muted hover:text-heading rounded-lg text-sm transition-colors flex items-center gap-1.5"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+            Fork
+          </button>
           <button
             type="button"
             onClick={() => setEditing(!editing)}
-            className="px-4 py-2 bg-elevated hover:bg-elevated/80 text-muted rounded-lg text-sm transition-colors border border-edge"
+            className="px-3 py-2 bg-elevated border border-edge text-muted hover:text-heading rounded-lg text-sm transition-colors"
           >
             {editing ? "Cancel" : "Edit"}
           </button>
           <button
             type="button"
             onClick={handleDelete}
-            className="px-4 py-2 bg-danger/10 hover:bg-danger/20 text-danger rounded-lg text-sm transition-colors"
+            className="px-3 py-2 bg-danger/10 text-danger hover:bg-danger/20 rounded-lg text-sm transition-colors"
           >
             Delete
           </button>
@@ -156,7 +240,7 @@ export default function ScriptDetailPage() {
             <button
               type="button"
               onClick={handleCopy}
-              className="text-xs px-3 py-1 bg-elevated hover:bg-elevated/80 text-muted rounded-md transition-colors border border-edge"
+              className="text-xs px-3 py-1 bg-elevated border border-edge text-muted rounded-md hover:text-heading transition-colors"
             >
               {copied ? "Copied!" : "Copy"}
             </button>
@@ -168,7 +252,6 @@ export default function ScriptDetailPage() {
       )}
 
       {editing ? (
-        /* Edit mode */
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -230,7 +313,6 @@ export default function ScriptDetailPage() {
           </button>
         </div>
       ) : (
-        /* View mode */
         <div className="bg-surface border border-edge rounded-lg overflow-hidden">
           <div className="px-4 py-2 bg-elevated text-xs text-faint font-mono border-b border-edge">
             {script.slug}.sh

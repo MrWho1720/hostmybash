@@ -56,7 +56,9 @@
       "mcp__stitch__list_screens",
       "WebFetch(domain:contribution.usercontent.google.com)",
       "Bash(npm run:*)",
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "Bash(ls -la /var/www/hostmybash/*.ts)",
+      "Bash(node_modules/.bin/tsc --noEmit)"
     ]
   }
 }

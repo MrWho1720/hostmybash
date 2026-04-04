@@ -5,7 +5,7 @@ import type { NextRequest } from "next/server";
 const MAIN_HOST = process.env.MAIN_HOST || "endever.in";
 
 // Paths on the main domain that require authentication
-const PROTECTED_PATHS = ["/scripts", "/dashboard", "/settings", "/nodes"];
+const PROTECTED_PATHS = ["/scripts", "/dashboard", "/settings", "/nodes", "/starred", "/explore"];
 
 export function proxy(request: NextRequest) {
   const host = request.headers.get("host") || "";

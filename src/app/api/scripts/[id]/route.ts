@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { scripts } from "@/lib/db/schema";
 import { requireAuth } from "@/lib/auth";
 import { updateScriptSchema } from "@/lib/validation/schemas";
+import { trackActivity } from "@/lib/activity";
 import { eq, and } from "drizzle-orm";
 
 export async function GET(
@@ -86,6 +87,13 @@ export async function PUT(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
+    trackActivity({
+      userId: user.id,
+      type: "updated_script",
+      scriptId: updated.id,
+      metadata: { name: updated.name },
+    });
+
     return NextResponse.json({ script: updated });
   } catch (error: any) {
     if (error.message === "Unauthorized") {
@@ -106,14 +114,21 @@ export async function DELETE(
     const { user } = await requireAuth();
     const { id } = await params;
 
-    const result = await db
+    const [deleted] = await db
       .delete(scripts)
       .where(and(eq(scripts.id, id), eq(scripts.ownerId, user.id)))
-      .returning({ id: scripts.id });
+      .returning({ id: scripts.id, name: scripts.name });
 
-    if (result.length === 0) {
+    if (!deleted) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
+
+    trackActivity({
+      userId: user.id,
+      type: "deleted_script",
+      scriptId: deleted.id,
+      metadata: { name: deleted.name },
+    });
 
     return NextResponse.json({ message: "Deleted" });
   } catch (error: any) {

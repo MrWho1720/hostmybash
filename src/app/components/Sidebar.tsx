@@ -31,6 +31,24 @@ const navItems = [
     ),
   },
   {
+    href: "/explore",
+    label: "Explore",
+    icon: (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    ),
+  },
+  {
+    href: "/starred",
+    label: "Starred",
+    icon: (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+      </svg>
+    ),
+  },
+  {
     href: "/settings",
     label: "Settings",
     icon: (
@@ -42,13 +60,7 @@ const navItems = [
   },
 ];
 
-function Avatar({
-  src,
-  displayName,
-}: {
-  src: string;
-  displayName: string;
-}) {
+function Avatar({ src, displayName }: { src: string; displayName: string }) {
   const [errored, setErrored] = useState(false);
 
   if (errored) {
@@ -80,6 +92,13 @@ export default function Sidebar({ displayName, username, avatarUrl }: SidebarPro
     window.location.href = "/login";
   }
 
+  function isActive(href: string) {
+    if (href === "/scripts") {
+      return pathname === "/scripts" || (pathname.startsWith("/scripts/") && !pathname.startsWith("/scripts/new"));
+    }
+    return pathname === href || pathname.startsWith(href + "/");
+  }
+
   return (
     <aside className="w-64 bg-surface border-r border-edge flex flex-col">
       {/* Logo */}
@@ -92,26 +111,20 @@ export default function Sidebar({ displayName, username, avatarUrl }: SidebarPro
 
       {/* Nav */}
       <nav className="flex-1 p-4 space-y-1">
-        {navItems.map((item) => {
-          const active =
-            item.href === "/scripts"
-              ? pathname === "/scripts" || (pathname.startsWith("/scripts/") && item.href === "/scripts")
-              : pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                active
-                  ? "bg-accent/10 text-accent"
-                  : "text-muted hover:text-heading hover:bg-elevated"
-              }`}
-            >
-              {item.icon}
-              {item.label}
-            </Link>
-          );
-        })}
+        {navItems.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+              isActive(item.href)
+                ? "bg-accent/10 text-accent"
+                : "text-muted hover:text-heading hover:bg-elevated"
+            }`}
+          >
+            {item.icon}
+            {item.label}
+          </Link>
+        ))}
       </nav>
 
       {/* User profile widget */}
@@ -130,24 +143,6 @@ export default function Sidebar({ displayName, username, avatarUrl }: SidebarPro
               @{username}
             </p>
           </div>
-          <svg
-            className="w-4 h-4 text-faint group-hover:text-muted shrink-0 transition-colors"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
         </Link>
 
         <button
