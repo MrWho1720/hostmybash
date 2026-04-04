@@ -143,9 +143,13 @@ bun run start
 
 ## Environment Variables
 
-| Variable       | Description                  | Example                                                      |
-|----------------|------------------------------|--------------------------------------------------------------|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://hostmybash:pass@localhost:5432/hostmybash`     |
+| Variable            | Description                  | Example                                                      |
+|---------------------|------------------------------|--------------------------------------------------------------|
+| `POSTGRES_HOST`     | Postgres server host         | `localhost`                                                  |
+| `POSTGRES_PORT`     | Postgres server port         | `5432`                                                       |
+| `POSTGRES_USER`      | Postgres username            | `hostmybash`                                                 |
+| `POSTGRES_PASSWORD`  | Postgres user password       | `pass`                                                       |
+| `POSTGRES_DB`        | Postgres database name       | `hostmybash`                                                 |
 | `MAIN_HOST`    | Primary domain               | `endever.in`                                                 |
 | `NODE_ENV`     | Environment mode             | `development` or `production`                                |
 
