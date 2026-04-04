@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["bcrypt"],
   poweredByHeader: false,
   compress: true,
+  allowedDevOrigins: ['endever.in', '*.endever.in'],
 };
 
 export default nextConfig;
