@@ -5,12 +5,12 @@
 - [ ] Update Lucia `getUserAttributes` to include new fields
 - [ ] Push schema to PostgreSQL
 
-## Phase 2: Fix Registration UX
-- [ ] Show specific messages: "Email already taken", "Username already taken"
-- [ ] Add password confirmation field with mismatch error
-- [ ] Real-time username availability check (debounced API call)
-- [ ] Field-level error highlighting (red border on the failing field)
-- [ ] Show success state before redirect
+## Phase 2: Fix Registration UX ✅
+- [x] Show specific messages: "Email already taken", "Username already taken"
+- [x] Add password confirmation field with mismatch error
+- [x] Real-time username availability check (debounced API call)
+- [x] Field-level error highlighting (red border on the failing field)
+- [x] Show success state before redirect
 
 ## Phase 3: Fix Login UX
 - [ ] Clear error messages per scenario (no account, wrong password, deactivated)

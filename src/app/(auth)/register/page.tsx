@@ -1,123 +1,403 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+type FieldErrors = Record<string, string>;
+
+type UsernameStatus =
+  | "idle"
+  | "checking"
+  | "available"
+  | "taken"
+  | "invalid"
+  | "reserved"
+  | "too_short";
+
 export default function RegisterPage() {
   const router = useRouter();
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  // Form values
+  const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // UI state
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [globalError, setGlobalError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>("idle");
+
+  // Debounce ref
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Real-time username availability check
+  const checkUsername = useCallback(async (value: string) => {
+    if (!value || value.length < 3) {
+      setUsernameStatus(value.length > 0 ? "too_short" : "idle");
+      return;
+    }
+    setUsernameStatus("checking");
+    try {
+      const res = await fetch(
+        `/api/auth/check-username?username=${encodeURIComponent(value)}`
+      );
+      const data = await res.json();
+      if (data.available) {
+        setUsernameStatus("available");
+      } else if (data.reason === "reserved") {
+        setUsernameStatus("reserved");
+      } else if (data.reason === "invalid_format") {
+        setUsernameStatus("invalid");
+      } else {
+        setUsernameStatus("taken");
+      }
+    } catch {
+      setUsernameStatus("idle");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      checkUsername(username);
+    }, 450);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [username, checkUsername]);
+
+  // Clear field error when user starts typing
+  function clearFieldError(field: string) {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError("");
-    setLoading(true);
+    setGlobalError("");
 
-    const formData = new FormData(e.currentTarget);
+    // Client-side password confirmation check
+    const clientErrors: FieldErrors = {};
+    if (password !== confirmPassword) {
+      clientErrors.confirmPassword = "Passwords do not match";
+    }
+    if (Object.keys(clientErrors).length > 0) {
+      setFieldErrors(clientErrors);
+      return;
+    }
+
+    setLoading(true);
+    setFieldErrors({});
 
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.get("email"),
-          username: formData.get("username"),
-          password: formData.get("password"),
-          displayName: formData.get("displayName"),
-        }),
+        body: JSON.stringify({ email, username, password, displayName }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Registration failed");
+        if (data.fields) {
+          setFieldErrors(data.fields);
+        } else {
+          setGlobalError(data.error || "Registration failed");
+        }
         return;
       }
 
-      router.push("/scripts");
-      router.refresh();
+      // Show success state, then redirect
+      setSuccess(true);
+      setTimeout(() => {
+        router.push("/scripts");
+        router.refresh();
+      }, 1500);
     } catch {
-      setError("Network error");
+      setGlobalError("Network error — please try again");
     } finally {
       setLoading(false);
     }
   }
 
+  // Helper: get field border class
+  function fieldBorder(field: string) {
+    return fieldErrors[field]
+      ? "border-red-500 focus:ring-red-500"
+      : "border-gray-700 focus:ring-blue-500";
+  }
+
+  // Username status badge
+  function renderUsernameStatus() {
+    if (usernameStatus === "idle") return null;
+    if (usernameStatus === "checking") {
+      return (
+        <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+          <span className="inline-block w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+          Checking availability…
+        </p>
+      );
+    }
+    if (usernameStatus === "available") {
+      return (
+        <p className="text-xs text-emerald-400 mt-1">
+          ✓ @{username} is available
+        </p>
+      );
+    }
+    if (usernameStatus === "taken") {
+      return (
+        <p className="text-xs text-red-400 mt-1">
+          ✗ @{username} is already taken
+        </p>
+      );
+    }
+    if (usernameStatus === "reserved") {
+      return (
+        <p className="text-xs text-amber-400 mt-1">
+          ✗ This username is reserved
+        </p>
+      );
+    }
+    if (usernameStatus === "too_short") {
+      return (
+        <p className="text-xs text-gray-500 mt-1">
+          Username must be at least 3 characters
+        </p>
+      );
+    }
+    if (usernameStatus === "invalid") {
+      return (
+        <p className="text-xs text-red-400 mt-1">
+          Only lowercase letters, numbers and hyphens (not at start/end)
+        </p>
+      );
+    }
+    return null;
+  }
+
+  // Success overlay
+  if (success) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-gray-900 rounded-xl p-10 border border-gray-800 flex flex-col items-center gap-4 text-center">
+          <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
+            <svg
+              className="w-8 h-8 text-emerald-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-white">Account created!</h2>
+          <p className="text-gray-400">Redirecting you to your dashboard…</p>
+          <div className="w-48 h-1 bg-gray-800 rounded-full overflow-hidden mt-2">
+            <div className="h-full bg-emerald-500 rounded-full animate-progress" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-gray-900 rounded-xl p-8 border border-gray-800">
-        <h1 className="text-2xl font-bold text-white mb-2">Create Account</h1>
-        <p className="text-gray-400 mb-6">Host your bash scripts on HostMyBash</p>
+        <h1 className="text-2xl font-bold text-white mb-1">Create Account</h1>
+        <p className="text-gray-400 mb-6 text-sm">
+          Host your bash scripts on HostMyBash
+        </p>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm">
-            {error}
+        {globalError && (
+          <div className="mb-4 p-3 bg-red-900/40 border border-red-700 rounded-lg text-red-300 text-sm">
+            {globalError}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+          {/* Display Name */}
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Display Name</label>
+            <label className="block text-sm text-gray-300 mb-1">
+              Display Name
+            </label>
             <input
+              id="displayName"
               name="displayName"
               type="text"
               required
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoComplete="name"
+              value={displayName}
+              onChange={(e) => {
+                setDisplayName(e.target.value);
+                clearFieldError("displayName");
+              }}
+              className={`w-full px-4 py-2.5 bg-gray-800 border rounded-lg text-white focus:outline-none focus:ring-2 transition-colors ${fieldBorder("displayName")}`}
+              placeholder="Jane Doe"
             />
+            {fieldErrors.displayName && (
+              <p className="text-xs text-red-400 mt-1">
+                {fieldErrors.displayName}
+              </p>
+            )}
           </div>
 
+          {/* Username */}
           <div>
             <label className="block text-sm text-gray-300 mb-1">Username</label>
             <input
+              id="username"
               name="username"
               type="text"
               required
+              autoComplete="username"
               minLength={3}
               maxLength={32}
               value={username}
-              onChange={(e) =>
-                setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))
-              }
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="myname"
+              onChange={(e) => {
+                const v = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "");
+                setUsername(v);
+                clearFieldError("username");
+              }}
+              className={`w-full px-4 py-2.5 bg-gray-800 border rounded-lg text-white font-mono focus:outline-none focus:ring-2 transition-colors ${fieldErrors.username ? "border-red-500 focus:ring-red-500" : usernameStatus === "available" ? "border-emerald-500 focus:ring-emerald-500" : usernameStatus === "taken" || usernameStatus === "reserved" ? "border-red-500 focus:ring-red-500" : "border-gray-700 focus:ring-blue-500"}`}
+              placeholder="yourname"
             />
-            {username && (
+            {fieldErrors.username ? (
+              <p className="text-xs text-red-400 mt-1">
+                {fieldErrors.username}
+              </p>
+            ) : (
+              renderUsernameStatus()
+            )}
+            {username && usernameStatus === "available" && (
               <p className="text-xs text-gray-500 mt-1">
                 Your scripts: https://{username}.endever.in/script-name
               </p>
             )}
           </div>
 
+          {/* Email */}
           <div>
             <label className="block text-sm text-gray-300 mb-1">Email</label>
             <input
+              id="email"
               name="email"
               type="email"
               required
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                clearFieldError("email");
+              }}
+              className={`w-full px-4 py-2.5 bg-gray-800 border rounded-lg text-white focus:outline-none focus:ring-2 transition-colors ${fieldBorder("email")}`}
+              placeholder="you@example.com"
             />
+            {fieldErrors.email && (
+              <p className="text-xs text-red-400 mt-1">{fieldErrors.email}</p>
+            )}
           </div>
 
+          {/* Password */}
           <div>
             <label className="block text-sm text-gray-300 mb-1">Password</label>
             <input
+              id="password"
               name="password"
               type="password"
               required
+              autoComplete="new-password"
               minLength={8}
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                clearFieldError("password");
+                // Re-check confirm if already touched
+                if (confirmPassword && e.target.value === confirmPassword) {
+                  clearFieldError("confirmPassword");
+                }
+              }}
+              className={`w-full px-4 py-2.5 bg-gray-800 border rounded-lg text-white focus:outline-none focus:ring-2 transition-colors ${fieldBorder("password")}`}
+              placeholder="At least 8 characters"
             />
-            <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
+            {fieldErrors.password ? (
+              <p className="text-xs text-red-400 mt-1">{fieldErrors.password}</p>
+            ) : (
+              <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
+            )}
+          </div>
+
+          {/* Confirm Password */}
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">
+              Confirm Password
+            </label>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              required
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                if (password === e.target.value) {
+                  clearFieldError("confirmPassword");
+                }
+              }}
+              onBlur={() => {
+                if (confirmPassword && password !== confirmPassword) {
+                  setFieldErrors((prev) => ({
+                    ...prev,
+                    confirmPassword: "Passwords do not match",
+                  }));
+                }
+              }}
+              className={`w-full px-4 py-2.5 bg-gray-800 border rounded-lg text-white focus:outline-none focus:ring-2 transition-colors ${
+                fieldErrors.confirmPassword
+                  ? "border-red-500 focus:ring-red-500"
+                  : confirmPassword && password === confirmPassword
+                  ? "border-emerald-500 focus:ring-emerald-500"
+                  : "border-gray-700 focus:ring-blue-500"
+              }`}
+              placeholder="Re-enter your password"
+            />
+            {fieldErrors.confirmPassword ? (
+              <p className="text-xs text-red-400 mt-1">
+                {fieldErrors.confirmPassword}
+              </p>
+            ) : confirmPassword && password === confirmPassword ? (
+              <p className="text-xs text-emerald-400 mt-1">✓ Passwords match</p>
+            ) : null}
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
           >
-            {loading ? "Creating account..." : "Create Account"}
+            {loading ? (
+              <>
+                <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Creating account…
+              </>
+            ) : (
+              "Create Account"
+            )}
           </button>
         </form>
 
