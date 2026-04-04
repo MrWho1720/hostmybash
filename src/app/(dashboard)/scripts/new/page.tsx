@@ -88,7 +88,7 @@ export default function NewScriptPage() {
           />
           {slug && (
             <p className="text-xs text-gray-500 mt-1">
-              curl https://username.endever.in/{slug} | bash
+              {`bash <(curl -s https://username.endever.in/${slug})`}
             </p>
           )}
         </div>
@@ -133,7 +133,7 @@ export default function NewScriptPage() {
         <div className="p-3 bg-yellow-900/30 border border-yellow-800 rounded-lg">
           <p className="text-xs text-yellow-300">
             Warning: Never run scripts from untrusted sources. Always review
-            scripts before executing them with curl | bash.
+            scripts before executing them.
           </p>
         </div>
 

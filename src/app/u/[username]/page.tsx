@@ -203,7 +203,7 @@ export default async function UserProfilePage({ params }: Props) {
                         </p>
                       )}
                       <p className="text-xs text-gray-700 font-mono mt-1">
-                        curl {installUrl} | bash
+                        {`bash <(curl -s ${installUrl})`}
                       </p>
                     </div>
 

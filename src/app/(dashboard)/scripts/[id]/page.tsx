@@ -54,7 +54,7 @@ export default function ScriptDetailPage() {
   }, [id]);
 
   const curlCommand = username && script
-    ? `curl https://${username}.endever.in/${script.slug} | bash`
+    ? `bash <(curl -s https://${username}.endever.in/${script.slug})`
     : "";
 
   function handleCopy() {
