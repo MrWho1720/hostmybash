@@ -17,12 +17,12 @@
 - [x] Loading spinner on submit button
 - [x] Redirect to intended page after login
 
-## Phase 4: Profile API & Settings Page
-- [ ] `GET /api/auth/me` — return full profile (avatar, bio, username, email, displayName)
-- [ ] `PUT /api/auth/profile` — update displayName, bio, avatarUrl
-- [ ] `PUT /api/auth/password` — change password (requires current password)
-- [ ] Avatar system: Gravatar fallback from email hash, allow custom URL
-- [ ] `/settings` dashboard page: edit name, bio, avatar, change password
+## Phase 4: Profile API & Settings Page ✅
+- [x] `GET /api/auth/me` — return full profile (avatar, bio, username, email, displayName)
+- [x] `PUT /api/auth/profile` — update displayName, bio, avatarUrl
+- [x] `PUT /api/auth/password` — change password (requires current password)
+- [x] Avatar system: Gravatar fallback from email hash, allow custom URL
+- [x] `/settings` dashboard page: edit name, bio, avatar, change password
 
 ## Phase 5: Sidebar User Profile Widget
 - [ ] Fetch user profile on dashboard load

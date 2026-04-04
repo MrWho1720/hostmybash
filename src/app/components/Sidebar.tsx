@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 const navItems = [
   { href: "/scripts", label: "My Scripts", icon: "📄" },
   { href: "/scripts/new", label: "New Script", icon: "➕" },
+  { href: "/settings", label: "Settings", icon: "⚙️" },
 ];
 
 export default function Sidebar() {
