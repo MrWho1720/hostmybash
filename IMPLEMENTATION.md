@@ -24,10 +24,10 @@
 - [x] Avatar system: Gravatar fallback from email hash, allow custom URL
 - [x] `/settings` dashboard page: edit name, bio, avatar, change password
 
-## Phase 5: Sidebar User Profile Widget
-- [ ] Fetch user profile on dashboard load
-- [ ] Show avatar + displayName + @username in sidebar footer
-- [ ] Link to `/settings`
+## Phase 5: Sidebar User Profile Widget ✅
+- [x] Fetch user profile on dashboard load
+- [x] Show avatar + displayName + @username in sidebar footer
+- [x] Link to `/settings`
 
 ## Phase 6: Public User Profile Page
 - [ ] `username.endever.in/` (subdomain root) shows public profile
