@@ -344,7 +344,14 @@ export default function ScriptDetailPage() {
 
       {/* ── Curl command block ── */}
       {curlCommand && script.visibility !== "private" && (
-        <div className="terminal-block" style={{ marginBottom: 20 }}>
+        <div 
+          className="terminal-block" 
+          style={{ marginBottom: 20, cursor: "pointer", transition: "border-color 0.15s ease, background-color 0.15s ease" }}
+          onClick={handleCopy}
+          title="Click to copy command"
+          onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border-muted)"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)"; }}
+        >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ff5f57" }} />
@@ -352,9 +359,7 @@ export default function ScriptDetailPage() {
               <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#28c840" }} />
               <span style={{ marginLeft: 6, fontSize: 11, color: "var(--text-faint)", fontFamily: "var(--font-mono)" }}>bash</span>
             </div>
-            <button
-              type="button"
-              onClick={handleCopy}
+            <div
               style={{
                 display: "inline-flex", alignItems: "center", gap: 5,
                 padding: "4px 10px",
@@ -363,15 +368,14 @@ export default function ScriptDetailPage() {
                 color: copied ? "var(--success)" : "var(--text-faint)",
                 background: "transparent",
                 border: "1px solid var(--border)",
-                cursor: "pointer",
                 transition: "color 0.15s ease, border-color 0.15s ease",
               }}
             >
               {copied ? <CheckIcon /> : <CopyIcon />}
               {copied ? "Copied!" : "Copy"}
-            </button>
+            </div>
           </div>
-          <code style={{ fontSize: 13, letterSpacing: "0.01em" }}>
+          <code style={{ fontSize: 13, letterSpacing: "0.01em", display: "block" }}>
             $ {curlCommand}
           </code>
         </div>
