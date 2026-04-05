@@ -33,9 +33,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=localStorage.getItem("hmb-theme");if(s==="light"||s==="dark"){document.documentElement.classList.add(s)}else{var d=window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";document.documentElement.classList.add(d)}}catch(e){document.documentElement.classList.add("dark")}})()`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>{children}</body>
     </html>
   );

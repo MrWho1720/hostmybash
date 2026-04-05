@@ -79,30 +79,6 @@ export default function TopBar({ displayName, username, avatarUrl }: TopBarProps
 
       {/* Right side: Action buttons and Profile */}
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <button
-          className="dashboard-card"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "8px 16px",
-            background: "var(--success)",
-            color: "#fff",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "13px",
-            fontWeight: 600,
-            cursor: "pointer",
-            boxShadow: "0 2px 4px rgba(16, 185, 129, 0.2)",
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 10 20 15 15 20" />
-            <path d="M4 4v7a4 4 0 0 0 4 4h12" />
-          </svg>
-          Share Dashboard
-        </button>
-
         {/* Profile Dropdown */}
         <div style={{ position: "relative" }}>
           <button

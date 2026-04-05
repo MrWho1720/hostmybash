@@ -227,40 +227,6 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Upgrade Plan Widget */}
-      <div style={{ padding: "24px 16px" }}>
-        <div style={{
-          background: "linear-gradient(135deg, #a855f7 0%, #6366f1 100%)",
-          borderRadius: "16px",
-          padding: "20px 16px",
-          color: "#fff",
-          textAlign: "center"
-        }}>
-          <div style={{ display: "inline-flex", padding: "8px", background: "rgba(255,255,255,0.2)", borderRadius: "10px", marginBottom: "12px" }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
-          </div>
-          <h4 style={{ margin: "0 0 8px", fontSize: "14px", fontWeight: 700 }}>View + Event Limit</h4>
-          <p style={{ margin: "0 0 16px", fontSize: "11px", opacity: 0.9 }}>225,948/500,000 Monthly Limit</p>
-          <div style={{ background: "rgba(255,255,255,0.3)", height: "4px", borderRadius: "2px", marginBottom: "16px", overflow: "hidden" }}>
-            <div style={{ background: "#fff", width: "45%", height: "100%", borderRadius: "2px" }} />
-          </div>
-          <button style={{
-            width: "100%", padding: "10px", borderRadius: "24px", background: "#fff", color: "#6366f1", border: "none", fontWeight: 600, fontSize: "13px", cursor: "pointer", marginBottom: "8px"
-          }}>
-            Learn more
-          </button>
-          <button style={{
-            width: "100%", padding: "10px", borderRadius: "24px", background: "#111827", color: "#fff", border: "none", fontWeight: 600, fontSize: "13px", cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "space-between"
-          }}>
-            <span style={{ flex: 1 }}>Upgrade plan</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-          </button>
-        </div>
-      </div>
-
     </aside>
   );
 }

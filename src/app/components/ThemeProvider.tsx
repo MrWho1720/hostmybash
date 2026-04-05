@@ -21,16 +21,18 @@ export function useTheme() {
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark");
 
-  // On mount: read saved preference or system preference
+  // On mount: read saved preference, fall back to system preference
   useEffect(() => {
     const saved = localStorage.getItem("hmb-theme") as Theme | null;
     if (saved === "light" || saved === "dark") {
       apply(saved);
       setTheme(saved);
     } else {
-      // Default to dark
-      apply("dark");
-      setTheme("dark");
+      // No saved preference — use system preference
+      const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const resolved: Theme = systemDark ? "dark" : "light";
+      apply(resolved);
+      setTheme(resolved);
     }
   }, []);
 
