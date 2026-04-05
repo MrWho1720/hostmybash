@@ -241,9 +241,10 @@ export default function DocsPage() {
   const [activeSection, setActiveSection] = useState("getting-started");
 
   return (
-    <div style={{ display: "flex", gap: 48, maxWidth: 1100, margin: "0 auto", paddingBottom: 60 }} className="animate-fade-in">
+    <div className="flex flex-col md:flex-row gap-8 md:gap-12 animate-fade-in" style={{ maxWidth: 1100, margin: "0 auto", paddingBottom: 60 }}>
       {/* Sidebar Table of Contents */}
       <nav
+        className="hidden md:block"
         style={{
           width: 220,
           flexShrink: 0,
@@ -493,7 +494,7 @@ export default function DocsPage() {
           the <Link href="/activity" style={{ color: "var(--accent-text)", textDecoration: "none", fontWeight: 500 }}>Activity</Link> page.
         </P>
         <P>Tracked events:</P>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 8, marginBottom: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 180px), 1fr))", gap: 8, marginBottom: 16 }}>
           {[
             { verb: "Created", color: "var(--success)", desc: "New script created" },
             { verb: "Updated", color: "var(--accent)", desc: "Script content or settings changed" },
@@ -591,7 +592,7 @@ export default function DocsPage() {
         {/* ─── Limits ─── */}
         <SectionHeading id="limits">Limits & Constraints</SectionHeading>
         <div style={{ marginBottom: 16 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0", border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
+          <div className="grid grid-cols-1 md:grid-cols-2" style={{ border: "1px solid var(--border)", borderRadius: 10, overflow: "hidden" }}>
             {[
               ["Username", "3 – 32 characters, lowercase alphanumeric + hyphens"],
               ["Display Name", "2 – 64 characters"],
