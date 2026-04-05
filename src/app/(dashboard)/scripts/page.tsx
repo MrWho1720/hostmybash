@@ -113,7 +113,7 @@ export default function ScriptsPage() {
   const totalStars = scripts.reduce((acc, s) => acc + s.starCount, 0);
 
   return (
-    <div style={{ paddingBottom: 40 }}>
+    <div style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", paddingBottom: 40 }} className="animate-fade-in">
       {/* ── Page header ── */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32 }}>
         <div>
@@ -205,13 +205,114 @@ export default function ScriptsPage() {
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 32, alignItems: "flex-start" }}>
-            {/* Scripts Grid */}
-            <div style={{ flex: 1, minWidth: 0 }}>
+          {/* Scripts Section */}
+          <div style={{ marginBottom: 32 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: "var(--text-heading)" }}>Your Scripts</h3>
+              <Link
+                href="/scripts/new"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "6px 12px",
+                  borderRadius: 8,
+                  background: "var(--bg-surface)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text-body)",
+                  fontSize: 13,
+                  fontWeight: 500,
+                  textDecoration: "none",
+                  transition: "all 0.15s ease",
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--border-muted)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--border)"; }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Script
+              </Link>
+            </div>
+
+            {scripts.length === 0 ? (
+              <div
+                className="dashboard-card"
+                style={{
+                  padding: "48px 24px",
+                  textAlign: "center",
+                  borderStyle: "dashed",
+                  background: "transparent"
+                }}
+              >
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto 12px" }}>
+                  <polyline points="16 18 22 12 16 6" />
+                  <polyline points="8 6 2 12 8 18" />
+                </svg>
+                <p style={{ margin: "0 0 6px", fontSize: 15, fontWeight: 500, color: "var(--text-muted)" }}>No scripts yet</p>
+                <p style={{ margin: 0, fontSize: 13, color: "var(--text-faint)" }}>
+                  Create your first script to get started.
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 16 }}>
+                {scripts.map((s) => (
+                  <div
+                    key={s.id}
+                    onClick={() => window.location.href = `/scripts/${s.id}`}
+                    className="dashboard-card"
+                    style={{
+                      padding: "20px",
+                      cursor: "pointer",
+                      position: "relative",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 16
+                    }}
+                  >
+                    {/* Script Header */}
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <div style={{ width: 36, height: 36, borderRadius: "8px", background: "var(--bg-elevated)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)" }}>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                        </div>
+                        <div>
+                          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "var(--text-heading)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "180px" }}>
+                            {s.name}
+                          </h3>
+                          <p style={{ margin: 0, fontSize: 12, color: "var(--text-faint)", fontFamily: "var(--font-mono)" }}>
+                            /{s.slug}
+                          </p>
+                        </div>
+                      </div>
+                      <VisibilityBadge v={s.visibility} />
+                    </div>
+
+                    {/* Script Body */}
+                    <p style={{ margin: 0, fontSize: 14, color: "var(--text-muted)", flex: 1, textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                      {s.description || "No description provided."}
+                    </p>
+
+                    {/* Script Footer */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid var(--border)", paddingTop: 16, marginTop: "auto" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13, color: "var(--text-faint)" }}>
+                        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><RunIcon /> {s.runCount}</span>
+                        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><StarIcon /> {s.starCount}</span>
+                        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><ForkIcon /> {s.forkCount}</span>
+                      </div>
+                      <span style={{ fontSize: 12, color: "var(--text-faint)" }}>{timeAgo(s.updatedAt)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Recent Activity Section */}
+          {activity.length > 0 && (
+            <div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: "var(--text-heading)" }}>Your Scripts</h3>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: "var(--text-heading)" }}>Recent Activity</h3>
                 <Link
-                  href="/scripts/new"
+                  href="/activity"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -229,128 +330,51 @@ export default function ScriptsPage() {
                   onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--border-muted)"; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--border)"; }}
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  New Script
+                  View All
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </Link>
               </div>
 
-              {scripts.length === 0 ? (
-                <div
-                  className="dashboard-card"
-                  style={{
-                    padding: "48px 24px",
-                    textAlign: "center",
-                    borderStyle: "dashed",
-                    background: "transparent"
-                  }}
-                >
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" style={{ margin: "0 auto 12px" }}>
-                    <polyline points="16 18 22 12 16 6" />
-                    <polyline points="8 6 2 12 8 18" />
-                  </svg>
-                  <p style={{ margin: "0 0 6px", fontSize: 15, fontWeight: 500, color: "var(--text-muted)" }}>No scripts yet</p>
-                  <p style={{ margin: 0, fontSize: 13, color: "var(--text-faint)" }}>
-                    Create your first script to get started.
-                  </p>
-                </div>
-              ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 16 }}>
-                  {scripts.map((s) => (
-                    <div
-                      key={s.id}
-                      onClick={() => window.location.href = `/scripts/${s.id}`}
-                      className="dashboard-card"
-                      style={{
-                        padding: "20px",
-                        cursor: "pointer",
-                        position: "relative",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 16
-                      }}
-                    >
-                      {/* Script Header */}
-                      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                          <div style={{ width: 36, height: 36, borderRadius: "8px", background: "var(--bg-elevated)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)" }}>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-                          </div>
-                          <div>
-                            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "var(--text-heading)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "180px" }}>
-                              {s.name}
-                            </h3>
-                            <p style={{ margin: 0, fontSize: 12, color: "var(--text-faint)", fontFamily: "var(--font-mono)" }}>
-                              /{s.slug}
-                            </p>
-                          </div>
+              <div className="dashboard-card" style={{ padding: "20px", overflow: "hidden" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 12 }}>
+                  {activity.slice(0, 6).map((event) => {
+                    const verb = EVENT_VERBS[event.type] || event.type;
+                    const name = event.script?.name ?? (event.metadata?.name as string) ?? "a script";
+                    const color = EVENT_COLOR[event.type] || "var(--text-muted)";
+                    return (
+                      <div
+                        key={event.id}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                          padding: "12px 14px",
+                          borderRadius: 10,
+                          background: "var(--bg-elevated)",
+                          border: "1px solid var(--border)",
+                          transition: "border-color 0.15s ease",
+                        }}
+                      >
+                        <div style={{
+                          width: 10, height: 10, borderRadius: "50%",
+                          background: color, flexShrink: 0,
+                        }} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ margin: 0, fontSize: 13, color: "var(--text-body)", lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            <span style={{ color: "var(--text-muted)" }}>{verb}</span>{" "}
+                            <span style={{ color: "var(--text-heading)", fontWeight: 500 }}>{name}</span>
+                          </p>
                         </div>
-                        <VisibilityBadge v={s.visibility} />
+                        <span style={{ fontSize: 11, color: "var(--text-faint)", whiteSpace: "nowrap", flexShrink: 0 }}>
+                          {timeAgo(event.createdAt)}
+                        </span>
                       </div>
-
-                      {/* Script Body */}
-                      <p style={{ margin: 0, fontSize: 14, color: "var(--text-muted)", flex: 1, textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                        {s.description || "No description provided."}
-                      </p>
-
-                      {/* Script Footer */}
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid var(--border)", paddingTop: 16, marginTop: "auto" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 13, color: "var(--text-faint)" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><RunIcon /> {s.runCount}</span>
-                          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><StarIcon /> {s.starCount}</span>
-                          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><ForkIcon /> {s.forkCount}</span>
-                        </div>
-                        <span style={{ fontSize: 12, color: "var(--text-faint)" }}>{timeAgo(s.updatedAt)}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Activity feed */}
-            {activity.length > 0 && (
-              <div style={{ width: "300px", flexShrink: 0 }}>
-                <div className="dashboard-card" style={{ padding: "24px" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-                    <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "var(--text-heading)" }}>
-                      Recent Activity
-                    </h3>
-                    <button style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-faint)" }}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-                    </button>
-                  </div>
-                  
-                  <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-                    {activity.map((event, i) => {
-                      const verb = EVENT_VERBS[event.type] || event.type;
-                      const name = event.script?.name ?? (event.metadata?.name as string) ?? "a script";
-                      const color = EVENT_COLOR[event.type] || "var(--text-muted)";
-                      const isLast = i === activity.length - 1;
-                      return (
-                        <div key={event.id} style={{ display: "flex", gap: 16, paddingBottom: isLast ? 0 : 20, position: "relative" }}>
-                          {/* Timeline line */}
-                          {!isLast && (
-                            <div style={{ position: "absolute", left: 7, top: 20, bottom: 0, width: 2, background: "var(--border)" }} />
-                          )}
-                          {/* Dot */}
-                          <div style={{ width: 16, height: 16, borderRadius: "50%", background: color, flexShrink: 0, marginTop: 2, position: "relative", zIndex: 1, border: "3px solid var(--bg-surface)" }} />
-                          <div style={{ flex: 1, minWidth: 0, background: "var(--bg-elevated)", padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border)" }}>
-                            <p style={{ margin: "0 0 4px", fontSize: 13, color: "var(--text-body)", lineHeight: 1.4 }}>
-                              <span style={{ color: "var(--text-muted)" }}>{verb}</span>{" "}
-                              <span style={{ color: "var(--text-heading)", fontWeight: 500 }}>{name}</span>
-                            </p>
-                            <p style={{ margin: 0, fontSize: 11, color: "var(--text-faint)" }}>
-                              {timeAgo(event.createdAt)}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                    );
+                  })}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </>
       )}
     </div>

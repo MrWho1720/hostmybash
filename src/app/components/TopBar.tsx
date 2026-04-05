@@ -66,7 +66,7 @@ export default function TopBar({ displayName, username, avatarUrl }: TopBarProps
         alignItems: "center",
         justifyContent: "space-between",
         padding: "16px 32px",
-        background: "var(--bg-page)",
+        background: "transparent",
         position: "sticky",
         top: 0,
         zIndex: 10,

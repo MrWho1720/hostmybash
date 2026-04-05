@@ -22,13 +22,13 @@ export default async function DashboardLayout({
     <ThemeProvider>
       <div className="flex min-h-screen" style={{ background: "var(--bg-inset)" }}>
         <Sidebar />
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0" style={{ background: "var(--bg-page)", borderTopLeftRadius: "24px", overflow: "hidden", boxShadow: "inset 0 4px 6px -1px rgba(0, 0, 0, 0.05)" }}>
           <TopBar
             displayName={user.displayName}
             username={user.username}
             avatarUrl={avatarUrl}
           />
-          <main className="flex-1 p-8 min-w-0 animate-fade-in" style={{ background: "var(--bg-page)", borderTopLeftRadius: "24px", boxShadow: "inset 0 4px 6px -1px rgba(0, 0, 0, 0.05)" }}>
+          <main className="flex-1 p-8 min-w-0 animate-fade-in">
             {children}
           </main>
         </div>

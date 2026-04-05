@@ -30,7 +30,7 @@ export default function StarredPage() {
   }, []);
 
   return (
-    <div className="max-w-4xl">
+    <div style={{ width: "100%", maxWidth: "1200px", margin: "0 auto" }}>
       <div className="mb-6">
         <h2 className="text-2xl font-semibold text-heading tracking-tight">Starred Scripts</h2>
         <p className="text-muted text-sm mt-1">Scripts you've starred for quick access</p>
