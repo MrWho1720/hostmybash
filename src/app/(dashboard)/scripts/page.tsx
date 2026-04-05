@@ -143,7 +143,7 @@ export default function ScriptsPage() {
       {!loading && !error && (
         <>
           {/* Top Stats Cards */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 24, marginBottom: 32 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 24, marginBottom: 32 }}>
             <div className="dashboard-card" style={{ padding: "20px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
                 <div style={{ width: 36, height: 36, borderRadius: "10px", background: "rgba(245, 158, 11, 0.15)", color: "var(--warning)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -253,7 +253,7 @@ export default function ScriptsPage() {
                 </p>
               </div>
             ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 320px), 1fr))", gap: 16 }}>
                 {scripts.map((s) => (
                   <div
                     key={s.id}
@@ -336,7 +336,7 @@ export default function ScriptsPage() {
               </div>
 
               <div className="dashboard-card" style={{ padding: "20px", overflow: "hidden" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 12 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 300px), 1fr))", gap: 12 }}>
                   {activity.slice(0, 6).map((event) => {
                     const verb = EVENT_VERBS[event.type] || event.type;
                     const name = event.script?.name ?? (event.metadata?.name as string) ?? "a script";

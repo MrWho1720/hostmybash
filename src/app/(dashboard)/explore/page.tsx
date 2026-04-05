@@ -198,8 +198,8 @@ export default function ExplorePage() {
         </div>
       </div>
 
-      {/* Sort tabs */}
       <div
+        className="overflow-x-auto whitespace-nowrap"
         style={{
           display: "flex",
           gap: 4,
@@ -281,7 +281,7 @@ export default function ExplorePage() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 300px), 1fr))",
               gap: 16,
             }}
           >

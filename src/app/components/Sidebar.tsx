@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggle";
 
-const navGroups = [
+export const navGroups = [
   {
     label: "Navigation",
     items: [
@@ -94,13 +94,11 @@ export default function Sidebar() {
 
   return (
     <aside
+      className="hidden md:flex flex-col shrink-0"
       style={{
         width: "260px",
-        flexShrink: 0,
         background: "var(--bg-inset)",
         borderRight: "1px solid var(--border)",
-        display: "flex",
-        flexDirection: "column",
         height: "100vh",
         position: "sticky",
         top: 0,

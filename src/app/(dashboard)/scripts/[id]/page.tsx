@@ -232,7 +232,7 @@ export default function ScriptDetailPage() {
   return (
     <div style={{ width: "100%", maxWidth: "1200px", margin: "0 auto" }} className="animate-fade-in">
       {/* ── Breadcrumb ── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20, fontSize: 13, color: "var(--text-muted)" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 20, fontSize: 13, color: "var(--text-muted)" }}>
         <Link href="/scripts" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}>
           Scripts
         </Link>
@@ -249,7 +249,7 @@ export default function ScriptDetailPage() {
       </div>
 
       {/* ── Title + Actions ── */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 16 }}>
+      <div className="flex flex-col md:flex-row items-start justify-between gap-4 mb-4">
         <div style={{ minWidth: 0 }}>
           <h1 style={{ margin: "0 0 6px", fontSize: 22, fontWeight: 700, color: "var(--text-heading)", letterSpacing: "-0.02em" }}>
             {script.name}
@@ -260,7 +260,7 @@ export default function ScriptDetailPage() {
             </p>
           )}
           {/* Stats row */}
-          <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 12, color: "var(--text-faint)" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 16, fontSize: 12, color: "var(--text-faint)" }}>
             <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, background: "var(--bg-elevated)", border: "1px solid var(--border)", color: visibilityColor, fontSize: 11, fontWeight: 500 }}>
               {script.visibility}
             </span>
@@ -278,7 +278,7 @@ export default function ScriptDetailPage() {
         </div>
 
         {/* Action buttons */}
-        <div style={{ display: "flex", gap: 8, flexShrink: 0, alignItems: "center" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, flexShrink: 0, alignItems: "center" }}>
           <button
             type="button"
             onClick={toggleStar}
@@ -384,7 +384,7 @@ export default function ScriptDetailPage() {
       {/* ── Edit form / Code viewer ── */}
       {editing ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3" style={{ gap: 12 }}>
             <div>
               <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--text-muted)", marginBottom: 6, letterSpacing: "0.02em" }}>Name</label>
               <input
