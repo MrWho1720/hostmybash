@@ -167,15 +167,15 @@ export default function ActivityPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 16, marginBottom: 28 }}>
         <div className="dashboard-card" style={{ padding: "16px 20px" }}>
           <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>Today</p>
-          <p style={{ margin: "4px 0 0", fontSize: 28, fontWeight: 700, color: "var(--text-heading)", lineHeight: 1 }}>{todayCount}</p>
+          <p className="animate-count" style={{ margin: "4px 0 0", fontSize: 28, fontWeight: 700, color: "var(--text-heading)", lineHeight: 1 }}>{todayCount}</p>
         </div>
         <div className="dashboard-card" style={{ padding: "16px 20px" }}>
           <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>This Week</p>
-          <p style={{ margin: "4px 0 0", fontSize: 28, fontWeight: 700, color: "var(--text-heading)", lineHeight: 1 }}>{weekCount}</p>
+          <p className="animate-count" style={{ margin: "4px 0 0", fontSize: 28, fontWeight: 700, color: "var(--text-heading)", lineHeight: 1 }}>{weekCount}</p>
         </div>
         <div className="dashboard-card" style={{ padding: "16px 20px" }}>
           <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>Total Events</p>
-          <p style={{ margin: "4px 0 0", fontSize: 28, fontWeight: 700, color: "var(--text-heading)", lineHeight: 1 }}>{events.length}{hasMore ? "+" : ""}</p>
+          <p className="animate-count" style={{ margin: "4px 0 0", fontSize: 28, fontWeight: 700, color: "var(--text-heading)", lineHeight: 1 }}>{events.length}{hasMore ? "+" : ""}</p>
         </div>
         <div className="dashboard-card" style={{ padding: "16px 20px" }}>
           <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>Most Common</p>
@@ -265,7 +265,7 @@ export default function ActivityPage() {
                       const isLast = i === dateEvents.length - 1;
 
                       return (
-                        <div key={event.id} style={{ display: "flex", gap: 16, paddingBottom: isLast ? 0 : 4, position: "relative" }}>
+                        <div key={event.id} className="animate-timeline-entry" style={{ display: "flex", gap: 16, paddingBottom: isLast ? 0 : 4, position: "relative" }}>
                           {/* Timeline line */}
                           {!isLast && (
                             <div style={{ position: "absolute", left: 15, top: 36, bottom: 0, width: 2, background: "var(--border)" }} />

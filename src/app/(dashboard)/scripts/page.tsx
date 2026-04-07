@@ -151,7 +151,7 @@ export default function ScriptsPage() {
                 </div>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <h2 style={{ margin: 0, fontSize: 32, fontWeight: 700, color: "var(--text-heading)", lineHeight: 1 }}>{scripts.length}</h2>
+                <h2 className="animate-count" style={{ margin: 0, fontSize: 32, fontWeight: 700, color: "var(--text-heading)", lineHeight: 1 }}>{scripts.length}</h2>
                 <span style={{ fontSize: 14, color: "var(--text-body)" }}>Total Scripts</span>
               </div>
               <p style={{ margin: "16px 0 0", fontSize: 12, color: "var(--accent)", fontWeight: 500, display: "flex", alignItems: "center", gap: 4 }}>
@@ -166,7 +166,7 @@ export default function ScriptsPage() {
                 </div>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <h2 style={{ margin: 0, fontSize: 32, fontWeight: 700, color: "var(--text-heading)", lineHeight: 1 }}>{totalRuns}</h2>
+                <h2 className="animate-count" style={{ margin: 0, fontSize: 32, fontWeight: 700, color: "var(--text-heading)", lineHeight: 1 }}>{totalRuns}</h2>
                 <span style={{ fontSize: 14, color: "var(--text-body)" }}>Total Executions</span>
               </div>
               <p style={{ margin: "16px 0 0", fontSize: 12, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 4 }}>
@@ -181,7 +181,7 @@ export default function ScriptsPage() {
                 </div>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <h2 style={{ margin: 0, fontSize: 32, fontWeight: 700, color: "var(--text-heading)", lineHeight: 1 }}>{totalStars}</h2>
+                <h2 className="animate-count" style={{ margin: 0, fontSize: 32, fontWeight: 700, color: "var(--text-heading)", lineHeight: 1 }}>{totalStars}</h2>
                 <span style={{ fontSize: 14, color: "var(--text-body)" }}>Total Stars</span>
               </div>
               <p style={{ margin: "16px 0 0", fontSize: 12, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 4 }}>

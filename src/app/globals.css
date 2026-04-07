@@ -300,42 +300,247 @@ body {
 /* ============================================================
    ANIMATIONS
    ============================================================ */
-@keyframes progress {
-  from {
-    width: 0%;
-  }
 
-  to {
-    width: 100%;
+/* Respect prefers-reduced-motion globally */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
+/* ── Keyframes ────────────────────────────────────────────── */
+@keyframes progress {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px) scaleY(0.96); }
+  to   { opacity: 1; transform: translateY(0) scaleY(1); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.6; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ── Base animation classes ──────────────────────────────── */
 .animate-progress {
   animation: progress 1.4s ease-in-out forwards;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .animate-fade-in {
-  animation: fadeIn 0.2s ease-out forwards;
+  animation: fadeIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-slide-left {
+  animation: slideInLeft 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-slide-right {
+  animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .animate-spin {
   animation: spin 0.7s linear infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* ── Staggered card animations ───────────────────────────── */
+.dashboard-card,
+.gh-card {
+  opacity: 0;
+  animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Stagger children in grids — auto-calculated per card */
+.dashboard-card:nth-child(1), .gh-card:nth-child(1) { animation-delay: 0.04s; }
+.dashboard-card:nth-child(2), .gh-card:nth-child(2) { animation-delay: 0.08s; }
+.dashboard-card:nth-child(3), .gh-card:nth-child(3) { animation-delay: 0.12s; }
+.dashboard-card:nth-child(4), .gh-card:nth-child(4) { animation-delay: 0.16s; }
+.dashboard-card:nth-child(5), .gh-card:nth-child(5) { animation-delay: 0.20s; }
+.dashboard-card:nth-child(6), .gh-card:nth-child(6) { animation-delay: 0.24s; }
+.dashboard-card:nth-child(7), .gh-card:nth-child(7) { animation-delay: 0.28s; }
+.dashboard-card:nth-child(8), .gh-card:nth-child(8) { animation-delay: 0.32s; }
+.dashboard-card:nth-child(9), .gh-card:nth-child(9) { animation-delay: 0.36s; }
+.dashboard-card:nth-child(10), .gh-card:nth-child(10) { animation-delay: 0.40s; }
+.dashboard-card:nth-child(n+11), .gh-card:nth-child(n+11) { animation-delay: 0.44s; }
+
+/* ── Card hover — smooth lift + glow ─────────────────────── */
+.dashboard-card {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.25s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-muted);
+}
+
+.dark .dashboard-card:hover {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.light .dashboard-card:hover {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.03);
+}
+
+.dashboard-card:active {
+  transform: translateY(-1px) scale(0.995);
+  transition-duration: 0.1s;
+}
+
+/* ── Badge animations ────────────────────────────────────── */
+.badge {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.badge:hover {
+  transform: scale(1.05);
+}
+
+/* ── Dropdown / popover entrance ─────────────────────────── */
+.dashboard-card[style*="position: absolute"],
+.dashboard-card[style*="position:absolute"] {
+  animation: slideDown 0.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform-origin: top right;
+}
+
+/* ── Smooth page transitions ─────────────────────────────── */
+main {
+  animation: fadeIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ── Sidebar nav link transitions ────────────────────────── */
+nav a {
+  transition: background 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              color 0.2s ease,
+              box-shadow 0.25s ease,
+              transform 0.2s ease;
+}
+
+nav a:active {
+  transform: scale(0.97);
+  transition-duration: 0.08s;
+}
+
+/* ── Button press effect ─────────────────────────────────── */
+button {
+  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.15s ease,
+              background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.96);
+  transition-duration: 0.08s;
+}
+
+/* ── Link smooth underline morph ─────────────────────────── */
+a {
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+/* ── Input focus animation ───────────────────────────────── */
+.input-field {
+  transition: border-color 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              background 0.2s ease;
+}
+
+/* ── Skeleton / loading shimmer ──────────────────────────── */
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface) 25%,
+    var(--bg-elevated) 37%,
+    var(--bg-surface) 63%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ── Timeline entry animations ───────────────────────────── */
+.animate-timeline-entry {
+  opacity: 0;
+  animation: slideInLeft 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-timeline-entry:nth-child(1)  { animation-delay: 0.05s; }
+.animate-timeline-entry:nth-child(2)  { animation-delay: 0.10s; }
+.animate-timeline-entry:nth-child(3)  { animation-delay: 0.15s; }
+.animate-timeline-entry:nth-child(4)  { animation-delay: 0.20s; }
+.animate-timeline-entry:nth-child(5)  { animation-delay: 0.25s; }
+.animate-timeline-entry:nth-child(6)  { animation-delay: 0.30s; }
+.animate-timeline-entry:nth-child(7)  { animation-delay: 0.35s; }
+.animate-timeline-entry:nth-child(8)  { animation-delay: 0.40s; }
+.animate-timeline-entry:nth-child(9)  { animation-delay: 0.45s; }
+.animate-timeline-entry:nth-child(10) { animation-delay: 0.50s; }
+.animate-timeline-entry:nth-child(n+11) { animation-delay: 0.55s; }
+
+/* ── Stat number count-up feel ───────────────────────────── */
+.animate-count {
+  animation: fadeInScale 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ── Smooth theme transition ─────────────────────────────── */
+html.dark, html.light {
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+aside, nav, .dashboard-card, .gh-card, .badge, .input-field, .terminal-block, .gh-code-block {
+  transition-property: background, background-color, border-color, box-shadow, color, transform;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
 }
